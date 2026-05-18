@@ -2,7 +2,6 @@ package readme
 
 import (
 	"fmt"
-	"strings"
 )
 
 // APIError models an error payload returned by the ReadMe API v2.
@@ -34,12 +33,11 @@ func (e APIError) Error() string {
 	if len(e.Errors) == 0 {
 		return fmt.Sprintf("%d %s: %s", e.Status, e.Title, e.Detail)
 	}
-	var b strings.Builder
-	fmt.Fprintf(&b, "%d %s: %s", e.Status, e.Title, e.Detail)
+	s := fmt.Sprintf("%d %s: %s", e.Status, e.Title, e.Detail)
 	for _, fe := range e.Errors {
 		if fe.Key != "" || fe.Message != "" {
-			fmt.Fprintf(&b, " [%s: %s]", fe.Key, fe.Message)
+			s += fmt.Sprintf(" [%s: %s]", fe.Key, fe.Message)
 		}
 	}
-	return b.String()
+	return s
 }

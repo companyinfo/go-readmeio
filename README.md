@@ -1,4 +1,4 @@
-# goreadme
+# readme
 
 A Go client for the ReadMe API v2 that provides typed DTOs and convenient services for common Docs operations:
 - Categories (create, list, get-by-title, update, delete)
