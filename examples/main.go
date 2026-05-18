@@ -1,0 +1,177 @@
+// Example flow demonstrating how to use the goreadme client against the
+// ReadMe API v2. It walks through:
+//
+//  1. Constructing a Client with an API key (and optionally a custom base URL).
+//  2. Listing categories for a branch + section.
+//  3. Looking up a single category by title.
+//  4. Creating, fetching, updating and deleting a Guide page.
+//  5. Creating, fetching, updating and deleting a Reference page
+//     (including the Reference-specific `api` block: method + path).
+//
+// Configuration is read from environment variables so the example stays
+// runnable without code changes:
+//
+//	README_API_KEY   (required) — your ReadMe API key
+//	README_BASE_URL  (optional) — defaults to https://api.readme.com/v2
+//	README_BRANCH    (optional) — defaults to "v0.0"
+//	README_RUN_WRITE (optional) — set to "1" to run the create/update/delete
+//	                              flows. Defaults to read-only.
+//
+// Run with:
+//
+//	README_API_KEY=rdme_xxx README_RUN_WRITE=1 go run ./examples
+package main
+
+import (
+	"context"
+	"fmt"
+	"log"
+	"os"
+	"time"
+
+	"github.com/companyinfo/readme"
+)
+
+func envOr(key, fallback string) string {
+	if v := os.Getenv(key); v != "" {
+		return v
+	}
+	return fallback
+}
+
+func main() {
+	apiKey := os.Getenv("README_API_KEY")
+	if apiKey == "" {
+		log.Fatal("README_API_KEY env var is required")
+	}
+
+	baseURL := envOr("README_BASE_URL", "https://api.readme.com/v2")
+	branch := envOr("README_BRANCH", "v0.0")
+	runWrite := os.Getenv("README_RUN_WRITE") == "1"
+
+	client, err := goreadme.New(apiKey, goreadme.WithBaseURL(baseURL))
+	if err != nil {
+		log.Fatalf("failed to create client: %v", err)
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+
+	// ---------------------------------------------------------------------
+	// 1. Categories — read-only listing for both sections.
+	// ---------------------------------------------------------------------
+	guideCats, err := client.Categories.Get(ctx, branch, "guides")
+	if err != nil {
+		log.Fatalf("categories.Get(guides): %v", err)
+	}
+	fmt.Printf("Fetched %d guide categories on branch %q\n", len(guideCats), branch)
+	for i, c := range guideCats {
+		fmt.Printf("  %d. %s (uri=%s)\n", i+1, c.Title, c.URI)
+	}
+
+	refCats, err := client.Categories.Get(ctx, branch, "reference")
+	if err != nil {
+		log.Fatalf("categories.Get(reference): %v", err)
+	}
+	fmt.Printf("Fetched %d reference categories on branch %q\n", len(refCats), branch)
+
+	// 1b. Look up a single category by title (uses the first guide category
+	//     returned above, if any).
+	if len(guideCats) > 0 {
+		first := guideCats[0]
+		cat, err := client.Categories.GetByTitle(ctx, branch, "guides", first.Title)
+		if err != nil {
+			log.Fatalf("categories.GetByTitle(%q): %v", first.Title, err)
+		}
+		fmt.Printf("Resolved category by title: %+v\n", cat)
+	}
+
+	if !runWrite {
+		fmt.Println("README_RUN_WRITE != 1 — skipping create/update/delete flow.")
+		return
+	}
+
+	// ---------------------------------------------------------------------
+	// 2. Guide CRUD flow.
+	// ---------------------------------------------------------------------
+	if len(guideCats) == 0 {
+		log.Fatal("no guide categories on this branch — cannot create a guide")
+	}
+	guideCatURI := guideCats[0].URI
+
+	guide, err := client.Guides.Create(ctx, branch, goreadme.GuideParams{
+		Title:    "Hello from goreadme",
+		Category: &goreadme.ResourceRef{URI: guideCatURI},
+		Content: &goreadme.GuideContent{
+			Body:    "# Hello\n\nCreated by the goreadme example.",
+			Excerpt: "Example guide created via goreadme.",
+		},
+	})
+	if err != nil {
+		log.Fatalf("guides.Create: %v", err)
+	}
+	fmt.Printf("Created guide: title=%q slug=%q\n", guide.Title, guide.Slug)
+
+	got, err := client.Guides.Get(ctx, branch, guide.Slug)
+	if err != nil {
+		log.Fatalf("guides.Get: %v", err)
+	}
+	fmt.Printf("Fetched guide: title=%q\n", got.Title)
+
+	updated, err := client.Guides.Update(ctx, branch, guide.Slug, goreadme.GuideParams{
+		Title: "Hello from goreadme (updated)",
+	})
+	if err != nil {
+		log.Fatalf("guides.Update: %v", err)
+	}
+	fmt.Printf("Updated guide title to: %q\n", updated.Title)
+
+	if err := client.Guides.Delete(ctx, branch, guide.Slug); err != nil {
+		log.Fatalf("guides.Delete: %v", err)
+	}
+	fmt.Printf("Deleted guide %q\n", guide.Slug)
+
+	// ---------------------------------------------------------------------
+	// 3. Reference CRUD flow (note the Reference-specific `api` block).
+	// ---------------------------------------------------------------------
+	if len(refCats) == 0 {
+		log.Println("no reference categories on this branch — skipping reference flow")
+		return
+	}
+	refCatURI := refCats[0].URI
+
+	ref, err := client.Reference.Create(ctx, branch, goreadme.ReferenceParams{
+		Title:    "List pets",
+		Category: &goreadme.ResourceRef{URI: refCatURI},
+		API: &goreadme.ReferenceAPI{
+			Method: "GET",
+			Path:   "/pets",
+		},
+		Content: &goreadme.GuideContent{
+			Excerpt: "Returns all pets from the system.",
+		},
+	})
+	if err != nil {
+		log.Fatalf("reference.Create: %v", err)
+	}
+	fmt.Printf("Created reference: title=%q slug=%q api=%+v\n", ref.Title, ref.Slug, ref.API)
+
+	gotRef, err := client.Reference.Get(ctx, branch, ref.Slug)
+	if err != nil {
+		log.Fatalf("reference.Get: %v", err)
+	}
+	fmt.Printf("Fetched reference: title=%q\n", gotRef.Title)
+
+	updatedRef, err := client.Reference.Update(ctx, branch, ref.Slug, goreadme.ReferenceParams{
+		API: &goreadme.ReferenceAPI{Method: "POST", Path: "/pets"},
+	})
+	if err != nil {
+		log.Fatalf("reference.Update: %v", err)
+	}
+	fmt.Printf("Updated reference api block to: %+v\n", updatedRef.API)
+
+	if err := client.Reference.Delete(ctx, branch, ref.Slug); err != nil {
+		log.Fatalf("reference.Delete: %v", err)
+	}
+	fmt.Printf("Deleted reference %q\n", ref.Slug)
+}
