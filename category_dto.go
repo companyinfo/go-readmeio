@@ -1,4 +1,4 @@
-package goreadme
+package readme
 
 // CategoryType identifies the section a category belongs to in ReadMe API v2.
 //

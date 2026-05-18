@@ -40,16 +40,13 @@ func envOr(key, fallback string) string {
 }
 
 func main() {
-	apiKey := os.Getenv("README_API_KEY")
-	if apiKey == "" {
-		log.Fatal("README_API_KEY env var is required")
-	}
+	apiKey := "***********************"
 
 	baseURL := envOr("README_BASE_URL", "https://api.readme.com/v2")
 	branch := envOr("README_BRANCH", "v0.0")
-	runWrite := os.Getenv("README_RUN_WRITE") == "1"
+	runWrite := false
 
-	client, err := goreadme.New(apiKey, goreadme.WithBaseURL(baseURL))
+	client, err := readme.New(apiKey, readme.WithBaseURL(baseURL))
 	if err != nil {
 		log.Fatalf("failed to create client: %v", err)
 	}
@@ -99,10 +96,10 @@ func main() {
 	}
 	guideCatURI := guideCats[0].URI
 
-	guide, err := client.Guides.Create(ctx, branch, goreadme.GuideParams{
+	guide, err := client.Guides.Create(ctx, branch, readme.GuideParams{
 		Title:    "Hello from goreadme",
-		Category: &goreadme.ResourceRef{URI: guideCatURI},
-		Content: &goreadme.GuideContent{
+		Category: &readme.ResourceRef{URI: guideCatURI},
+		Content: &readme.GuideContent{
 			Body:    "# Hello\n\nCreated by the goreadme example.",
 			Excerpt: "Example guide created via goreadme.",
 		},
@@ -118,7 +115,7 @@ func main() {
 	}
 	fmt.Printf("Fetched guide: title=%q\n", got.Title)
 
-	updated, err := client.Guides.Update(ctx, branch, guide.Slug, goreadme.GuideParams{
+	updated, err := client.Guides.Update(ctx, branch, guide.Slug, readme.GuideParams{
 		Title: "Hello from goreadme (updated)",
 	})
 	if err != nil {
@@ -140,14 +137,14 @@ func main() {
 	}
 	refCatURI := refCats[0].URI
 
-	ref, err := client.Reference.Create(ctx, branch, goreadme.ReferenceParams{
+	ref, err := client.Reference.Create(ctx, branch, readme.ReferenceParams{
 		Title:    "List pets",
-		Category: &goreadme.ResourceRef{URI: refCatURI},
-		API: &goreadme.ReferenceAPI{
-			Method: "GET",
+		Category: &readme.ResourceRef{URI: refCatURI},
+		API: &readme.ReferenceAPI{
+			Method: "get",
 			Path:   "/pets",
 		},
-		Content: &goreadme.GuideContent{
+		Content: &readme.GuideContent{
 			Excerpt: "Returns all pets from the system.",
 		},
 	})
@@ -162,8 +159,8 @@ func main() {
 	}
 	fmt.Printf("Fetched reference: title=%q\n", gotRef.Title)
 
-	updatedRef, err := client.Reference.Update(ctx, branch, ref.Slug, goreadme.ReferenceParams{
-		API: &goreadme.ReferenceAPI{Method: "POST", Path: "/pets"},
+	updatedRef, err := client.Reference.Update(ctx, branch, ref.Slug, readme.ReferenceParams{
+		API: &readme.ReferenceAPI{Method: "post", Path: "/pets"},
 	})
 	if err != nil {
 		log.Fatalf("reference.Update: %v", err)

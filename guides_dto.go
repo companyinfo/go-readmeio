@@ -1,4 +1,4 @@
-package goreadme
+package readme
 
 // Guide models a guides page returned by ReadMe API v2.
 //

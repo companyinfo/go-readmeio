@@ -1,4 +1,4 @@
-package goreadme
+package readme
 
 // Reference models a reference (API reference) page returned by ReadMe API v2.
 //

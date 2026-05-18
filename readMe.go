@@ -1,5 +1,5 @@
 // Package goreadme provides utilities for generating and updating README files.
-package goreadme
+package readme
 
 import (
 	"errors"

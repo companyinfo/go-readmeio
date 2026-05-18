@@ -1,4 +1,4 @@
-package goreadme
+package readme
 
 import (
 	"context"
