@@ -28,7 +28,7 @@ type CategoryService interface {
 	// ("guides" or "reference").
 	List(ctx context.Context, branch, section string) ([]Category, error)
 	// GetByTitle retrieves a single category by its title on the given branch
-	// and section.
+	// and section. The title is a unique identifier within a (branch, section) pair.
 	GetByTitle(ctx context.Context, branch, section, title string) (*Category, error)
 	// Update updates an existing category identified by its title on the given
 	// branch and section. Only the fields set in params are sent.
@@ -119,7 +119,8 @@ func (c *CategoryClient) List(ctx context.Context, branch, section string) ([]Ca
 	return list, nil
 }
 
-// GetByTitle retrieves a single category by its title.
+// GetByTitle retrieves a single category by its title, which is a unique
+// identifier within a (branch, section) pair.
 // ReadMe API v2: GET /branches/{branch}/categories/{section}/{title}
 func (c *CategoryClient) GetByTitle(ctx context.Context, branch, section, title string) (*Category, error) {
 	if err := check().
