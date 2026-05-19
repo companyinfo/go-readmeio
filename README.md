@@ -2,8 +2,8 @@
 
 A Go client for the ReadMe API v2 that provides typed DTOs and convenient services for common Docs operations:
 - Categories (create, list, get-by-title, update, delete)
-- Guides (create, get, update, delete)
-- References (create, get, update, delete)
+- Guides (create, list, update, delete)
+- References (create, list, update, delete)
 
 This SDK wraps JSON:API-style payloads with idiomatic Go types and adds light client-side validation and structured error handling.
 
@@ -57,7 +57,7 @@ func main() {
 	section := "reference"
 
 	// List categories
-	cats, err := client.Categories.Get(ctx, branch, section)
+	cats, err := client.Categories.List(ctx, branch, section)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -86,9 +86,9 @@ Authentication: pass your ReadMe API key to goreadme.New. The client sends Autho
 
 ## Services
 
-- Categories: Create, Get (by section), GetByTitle, Update, Delete
-- Guides: Create, Get, Update, Delete
-- References: Create, Get, Update, Delete
+- Categories: Create, List (by section), GetByTitle, Update, Delete
+- Guides: Create, List, Update, Delete
+- References: Create, List, Update, Delete
 
 All operations require a branch (version) path parameter (e.g., v1.0, v0.0).
 
