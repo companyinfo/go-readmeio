@@ -38,7 +38,7 @@ func TestGuideClient_Create(t *testing.T) {
 	assert.Equal(t, "Hello", g.Title)
 }
 
-func TestGuideClient_Get(t *testing.T) {
+func TestGuideClient_List(t *testing.T) {
 	srv := httptest.NewServer(jsonHandler(func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
 		assert.Equal(t, "/branches/v1/guides/hello", r.URL.Path)
@@ -47,7 +47,7 @@ func TestGuideClient_Get(t *testing.T) {
 	defer srv.Close()
 
 	c := newTestClient(t, srv)
-	g, err := c.Guides.Get(context.Background(), "v1", "hello")
+	g, err := c.Guides.List(context.Background(), "v1", "hello")
 	require.NoError(t, err)
 	assert.Equal(t, "hello", g.Slug)
 }
@@ -86,7 +86,7 @@ func TestGuideClient_APIError(t *testing.T) {
 	defer srv.Close()
 
 	c := newTestClient(t, srv)
-	_, err := c.Guides.Get(context.Background(), "v1", "hello")
+	_, err := c.Guides.List(context.Background(), "v1", "hello")
 	require.Error(t, err)
 	apiErr, ok := err.(*APIError)
 	require.True(t, ok, "expected *APIError, got %T (%v)", err, err)
@@ -114,7 +114,7 @@ func TestGuideClient_Validation(t *testing.T) {
 			return e
 		}, "category"},
 		{"get empty slug", func() error {
-			_, e := c.Guides.Get(context.Background(), "v1", "")
+			_, e := c.Guides.List(context.Background(), "v1", "")
 			return e
 		}, "slug"},
 		{"update empty branch", func() error {

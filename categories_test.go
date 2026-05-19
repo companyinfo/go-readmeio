@@ -35,7 +35,7 @@ func TestCategoryClient_Create(t *testing.T) {
 	assert.Equal(t, "/categories/guides/intro", cat.URI)
 }
 
-func TestCategoryClient_Get(t *testing.T) {
+func TestCategoryClient_List(t *testing.T) {
 	srv := httptest.NewServer(jsonHandler(func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
 		assert.Equal(t, "/branches/v1/categories/guides", r.URL.Path)
@@ -44,7 +44,7 @@ func TestCategoryClient_Get(t *testing.T) {
 	defer srv.Close()
 
 	c := newTestClient(t, srv)
-	cats, err := c.Categories.Get(context.Background(), "v1", "guides")
+	cats, err := c.Categories.List(context.Background(), "v1", "guides")
 	require.NoError(t, err)
 	require.Len(t, cats, 2)
 	assert.Equal(t, "A", cats[0].Title)
@@ -127,7 +127,7 @@ func TestCategoryClient_Validation(t *testing.T) {
 			return e
 		}, "section"},
 		{"get bad section", func() error {
-			_, e := c.Categories.Get(context.Background(), "v1", "bogus")
+			_, e := c.Categories.List(context.Background(), "v1", "bogus")
 			return e
 		}, "section"},
 		{"get-by-title empty title", func() error {

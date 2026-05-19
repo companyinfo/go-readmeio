@@ -24,8 +24,8 @@ type guideEnvelope struct {
 type GuideService interface {
 	// Create creates a new guide on the given branch.
 	Create(ctx context.Context, branch string, params GuideParams) (*Guide, error)
-	// Get retrieves a single guide by its slug on the given branch.
-	Get(ctx context.Context, branch, slug string) (*Guide, error)
+	// List retrieves a single guide by its slug on the given branch.
+	List(ctx context.Context, branch, slug string) (*Guide, error)
 	// Update updates an existing guide identified by its slug. Only the fields
 	// set in params are sent.
 	Update(ctx context.Context, branch, slug string, params GuideParams) (*Guide, error)
@@ -76,9 +76,9 @@ func (g *GuideClient) Create(ctx context.Context, branch string, params GuidePar
 	return &out.Data, nil
 }
 
-// Get retrieves a single guide by its slug.
+// List retrieves a single guide by its slug.
 // ReadMe API v2: GET /branches/{branch}/guides/{slug}
-func (g *GuideClient) Get(ctx context.Context, branch, slug string) (*Guide, error) {
+func (g *GuideClient) List(ctx context.Context, branch, slug string) (*Guide, error) {
 	if err := check().Branch(branch).Slug(slug).Err(); err != nil {
 		return nil, err
 	}

@@ -24,9 +24,9 @@ type CategoryService interface {
 	// Create creates a new category on the given branch. The category's section
 	// ("guides" or "reference") is provided in params and sent in the request body.
 	Create(ctx context.Context, branch string, params CategoryParams) (*Category, error)
-	// Get retrieves all categories on the given branch for the given section
+	// List retrieves all categories on the given branch for the given section
 	// ("guides" or "reference").
-	Get(ctx context.Context, branch, section string) ([]Category, error)
+	List(ctx context.Context, branch, section string) ([]Category, error)
 	// GetByTitle retrieves a single category by its title on the given branch
 	// and section.
 	GetByTitle(ctx context.Context, branch, section, title string) (*Category, error)
@@ -86,9 +86,9 @@ func (c *CategoryClient) Create(ctx context.Context, branch string, params Categ
 	return &cat, nil
 }
 
-// Get retrieves all categories on the given branch for the given section.
+// List retrieves all categories on the given branch for the given section.
 // ReadMe API v2: GET /branches/{branch}/categories/{section}
-func (c *CategoryClient) Get(ctx context.Context, branch, section string) ([]Category, error) {
+func (c *CategoryClient) List(ctx context.Context, branch, section string) ([]Category, error) {
 	if err := check().
 		Branch(branch).
 		Section(section, &section).

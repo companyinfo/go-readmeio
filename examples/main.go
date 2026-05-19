@@ -57,7 +57,7 @@ func main() {
 	// ---------------------------------------------------------------------
 	// 1. Categories — read-only listing for both sections.
 	// ---------------------------------------------------------------------
-	guideCats, err := client.Categories.Get(ctx, branch, "guides")
+	guideCats, err := client.Categories.List(ctx, branch, "guides")
 	if err != nil {
 		log.Fatalf("categories.Get(guides): %v", err)
 	}
@@ -66,7 +66,7 @@ func main() {
 		fmt.Printf("  %d. %s (uri=%s)\n", i+1, c.Title, c.URI)
 	}
 
-	refCats, err := client.Categories.Get(ctx, branch, "reference")
+	refCats, err := client.Categories.List(ctx, branch, "reference")
 	if err != nil {
 		log.Fatalf("categories.Get(reference): %v", err)
 	}
@@ -109,7 +109,7 @@ func main() {
 	}
 	fmt.Printf("Created guide: title=%q slug=%q\n", guide.Title, guide.Slug)
 
-	got, err := client.Guides.Get(ctx, branch, guide.Slug)
+	got, err := client.Guides.List(ctx, branch, guide.Slug)
 	if err != nil {
 		log.Fatalf("guides.Get: %v", err)
 	}
@@ -153,7 +153,7 @@ func main() {
 	}
 	fmt.Printf("Created reference: title=%q slug=%q api=%+v\n", ref.Title, ref.Slug, ref.API)
 
-	gotRef, err := client.Reference.Get(ctx, branch, ref.Slug)
+	gotRef, err := client.Reference.List(ctx, branch, ref.Slug)
 	if err != nil {
 		log.Fatalf("reference.Get: %v", err)
 	}
