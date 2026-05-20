@@ -1,4 +1,4 @@
-// Package goreadme provides utilities for generating and updating README files.
+// Package readme provides utilities for generating and updating README files.
 package readme
 
 import (

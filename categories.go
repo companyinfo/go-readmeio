@@ -76,7 +76,7 @@ func (c *CategoryClient) Create(ctx context.Context, branch string, params Categ
 		return nil, err
 	}
 	if resp.IsError() {
-		return nil, resp.Error().(*APIError)
+		return nil, apiErrorFromResponse(resp)
 	}
 
 	var cat Category
@@ -109,7 +109,7 @@ func (c *CategoryClient) List(ctx context.Context, branch, section string) ([]Ca
 		return nil, err
 	}
 	if resp.IsError() {
-		return nil, resp.Error().(*APIError)
+		return nil, apiErrorFromResponse(resp)
 	}
 
 	var list []Category
@@ -145,7 +145,7 @@ func (c *CategoryClient) GetByTitle(ctx context.Context, branch, section, title 
 		return nil, err
 	}
 	if resp.IsError() {
-		return nil, resp.Error().(*APIError)
+		return nil, apiErrorFromResponse(resp)
 	}
 
 	var cat Category
@@ -181,7 +181,7 @@ func (c *CategoryClient) Update(ctx context.Context, branch, section, title stri
 		return nil, err
 	}
 	if resp.IsError() {
-		return nil, resp.Error().(*APIError)
+		return nil, apiErrorFromResponse(resp)
 	}
 
 	var cat Category
@@ -214,7 +214,7 @@ func (c *CategoryClient) Delete(ctx context.Context, branch, section, title stri
 		return err
 	}
 	if resp.IsError() {
-		return resp.Error().(*APIError)
+		return apiErrorFromResponse(resp)
 	}
 	return nil
 }
