@@ -22,8 +22,15 @@ type Category struct {
 	Title string `json:"title"`
 	// Section is "guides" or "reference".
 	Section CategoryType `json:"section,omitempty"`
+	// Links contain the `project` URI for the category.
+	Links CategoryLinks `json:"links"`
 	// URI to this category.
 	URI string `json:"uri"`
+}
+
+// CategoryLinks models the `links` block on a category.
+type CategoryLinks struct {
+	Project string `json:"project"`
 }
 
 // CategoryParams contains the fields used when creating or updating a category
@@ -36,20 +43,4 @@ type CategoryParams struct {
 	Title string `json:"title"`
 	// Section is "guides" or "reference". Required on Create; optional on Update.
 	Section CategoryType `json:"section,omitempty"`
-}
-
-// CategorySavedResponse models the response returned by ReadMe after creating or
-// updating a category in API v2.
-type CategorySavedResponse struct {
-	Data struct {
-		Title   string        `json:"title"`
-		Section string        `json:"section"`
-		Links   CategoryLinks `json:"links"`
-		Uri     string        `json:"uri"`
-	} `json:"data"`
-}
-
-// CategoryLinks models the `links` block on a category.
-type CategoryLinks struct {
-	Project string `json:"project"`
 }
