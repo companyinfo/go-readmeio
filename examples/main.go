@@ -57,7 +57,7 @@ func main() {
 	// ---------------------------------------------------------------------
 	// 1. Categories — read-only listing for both sections.
 	// ---------------------------------------------------------------------
-	guideCats, err := client.Categories.List(ctx, branch, "guides")
+	guideCats, err := client.Categories.List(ctx, branch, readme.CategoryTypeGuides)
 	if err != nil {
 		log.Fatalf("categories.Get(guides): %v", err)
 	}

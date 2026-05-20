@@ -85,11 +85,11 @@ func (v *validator) Category(ref *ResourceRef) *validator {
 // Section validates the `section` path parameter (must be "guides" or
 // "reference") and writes the canonical lowercase form back through the
 // out pointer when provided.
-func (v *validator) Section(section string, out *string) *validator {
+func (v *validator) Section(section CategoryType, out *string) *validator {
 	if v.err != nil {
 		return v
 	}
-	s := strings.ToLower(strings.TrimSpace(section))
+	s := strings.ToLower(strings.TrimSpace(string(section)))
 	if s != "guides" && s != "reference" {
 		return v.fail(fmt.Errorf("section must be 'guides' or 'reference'"))
 	}

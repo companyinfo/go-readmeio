@@ -24,16 +24,16 @@ type CategoryService interface {
 	Create(ctx context.Context, branch string, params CategoryParams) (*Category, error)
 	// List retrieves all categories on the given branch for the given section
 	// ("guides" or "reference").
-	List(ctx context.Context, branch, section string) ([]Category, error)
+	List(ctx context.Context, branch string, section CategoryType) ([]Category, error)
 	// GetByTitle retrieves a single category by its title on the given branch
 	// and section. The title is a unique identifier within a (branch, section) pair.
-	GetByTitle(ctx context.Context, branch, section, title string) (*Category, error)
+	GetByTitle(ctx context.Context, branch string, section CategoryType, title string) (*Category, error)
 	// Update updates an existing category identified by its title on the given
 	// branch and section. Only the fields set in params are sent.
-	Update(ctx context.Context, branch, section, title string, params CategoryParams) (*Category, error)
+	Update(ctx context.Context, branch string, section CategoryType, title string, params CategoryParams) (*Category, error)
 	// Delete removes a category identified by its title on the given branch
 	// and section.
-	Delete(ctx context.Context, branch, section, title string) error
+	Delete(ctx context.Context, branch string, section CategoryType, title string) error
 }
 
 // CategoryClient implements CategoryService.
@@ -52,7 +52,7 @@ func (c *CategoryClient) Create(ctx context.Context, branch string, params Categ
 	if err := check().
 		Branch(branch).
 		Title(params.Title).
-		Section(string(params.Section), nil).
+		Section(params.Section, nil).
 		Err(); err != nil {
 		return nil, err
 	}
@@ -82,10 +82,11 @@ func (c *CategoryClient) Create(ctx context.Context, branch string, params Categ
 
 // List retrieves all categories on the given branch for the given section.
 // ReadMe API v2: GET /branches/{branch}/categories/{section}
-func (c *CategoryClient) List(ctx context.Context, branch, section string) ([]Category, error) {
+func (c *CategoryClient) List(ctx context.Context, branch string, section CategoryType) ([]Category, error) {
+	var sec string
 	if err := check().
 		Branch(branch).
-		Section(section, &section).
+		Section(section, &sec).
 		Err(); err != nil {
 		return nil, err
 	}
@@ -94,7 +95,7 @@ func (c *CategoryClient) List(ctx context.Context, branch, section string) ([]Ca
 	resp, err := c.client.NewRequest(ctx).
 		SetPathParams(map[string]string{
 			"branch":  branch,
-			"section": section,
+			"section": sec,
 		}).
 		SetResult(&env).
 		SetError(&APIError{}).
@@ -116,10 +117,11 @@ func (c *CategoryClient) List(ctx context.Context, branch, section string) ([]Ca
 // GetByTitle retrieves a single category by its title, which is a unique
 // identifier within a (branch, section) pair.
 // ReadMe API v2: GET /branches/{branch}/categories/{section}/{title}
-func (c *CategoryClient) GetByTitle(ctx context.Context, branch, section, title string) (*Category, error) {
+func (c *CategoryClient) GetByTitle(ctx context.Context, branch string, section CategoryType, title string) (*Category, error) {
+	var sec string
 	if err := check().
 		Branch(branch).
-		Section(section, &section).
+		Section(section, &sec).
 		Title(title).
 		Err(); err != nil {
 		return nil, err
@@ -129,7 +131,7 @@ func (c *CategoryClient) GetByTitle(ctx context.Context, branch, section, title 
 	resp, err := c.client.NewRequest(ctx).
 		SetPathParams(map[string]string{
 			"branch":  branch,
-			"section": section,
+			"section": sec,
 			"title":   title,
 		}).
 		SetResult(&env).
@@ -151,10 +153,11 @@ func (c *CategoryClient) GetByTitle(ctx context.Context, branch, section, title 
 
 // Update updates an existing category identified by its title.
 // ReadMe API v2: PATCH /branches/{branch}/categories/{section}/{title}
-func (c *CategoryClient) Update(ctx context.Context, branch, section, title string, params CategoryParams) (*Category, error) {
+func (c *CategoryClient) Update(ctx context.Context, branch string, section CategoryType, title string, params CategoryParams) (*Category, error) {
+	var sec string
 	if err := check().
 		Branch(branch).
-		Section(section, &section).
+		Section(section, &sec).
 		Title(title).
 		Err(); err != nil {
 		return nil, err
@@ -164,7 +167,7 @@ func (c *CategoryClient) Update(ctx context.Context, branch, section, title stri
 	resp, err := c.client.NewRequest(ctx).
 		SetPathParams(map[string]string{
 			"branch":  branch,
-			"section": section,
+			"section": sec,
 			"title":   title,
 		}).
 		SetBody(params).
@@ -187,10 +190,11 @@ func (c *CategoryClient) Update(ctx context.Context, branch, section, title stri
 
 // Delete removes a category identified by its title.
 // ReadMe API v2: DELETE /branches/{branch}/categories/{section}/{title}
-func (c *CategoryClient) Delete(ctx context.Context, branch, section, title string) error {
+func (c *CategoryClient) Delete(ctx context.Context, branch string, section CategoryType, title string) error {
+	var sec string
 	if err := check().
 		Branch(branch).
-		Section(section, &section).
+		Section(section, &sec).
 		Title(title).
 		Err(); err != nil {
 		return err
@@ -199,7 +203,7 @@ func (c *CategoryClient) Delete(ctx context.Context, branch, section, title stri
 	resp, err := c.client.NewRequest(ctx).
 		SetPathParams(map[string]string{
 			"branch":  branch,
-			"section": section,
+			"section": sec,
 			"title":   title,
 		}).
 		SetError(&APIError{}).
