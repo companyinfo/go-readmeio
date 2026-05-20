@@ -53,7 +53,7 @@ func TestReferenceClient_List(t *testing.T) {
 	defer srv.Close()
 
 	c := newTestClient(t, srv)
-	ref, err := c.Reference.List(context.Background(), "v1", "pets")
+	ref, err := c.Reference.Get(context.Background(), "v1", "pets")
 	require.NoError(t, err)
 	assert.Equal(t, "pets", ref.Slug)
 }
@@ -123,7 +123,7 @@ func TestReferenceClient_Validation(t *testing.T) {
 			return e
 		}, "category"},
 		{"get empty slug", func() error {
-			_, e := c.Reference.List(context.Background(), "v1", "")
+			_, e := c.Reference.Get(context.Background(), "v1", "")
 			return e
 		}, "slug"},
 		{"update empty branch", func() error {

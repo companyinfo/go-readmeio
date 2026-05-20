@@ -1,7 +1,12 @@
 package readme
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
+	"net/http"
+
+	"github.com/go-resty/resty/v2"
 )
 
 // APIError models an error payload returned by the ReadMe API v2.
@@ -40,4 +45,26 @@ func (e APIError) Error() string {
 		}
 	}
 	return s
+}
+
+// apiErrorFromResponse returns a best-effort *APIError parsed from the HTTP
+// response, falling back to HTTP status text and the raw response body when
+// the body is missing or not a valid APIError payload.
+func apiErrorFromResponse(resp *resty.Response) error {
+	if resp == nil {
+		return &APIError{Title: "unknown error"}
+	}
+
+	e := &APIError{}
+	// Ignore unmarshal errors: we fall back to status text + raw body below.
+	_ = json.Unmarshal(resp.Body(), e)
+
+	if e.Status == 0 {
+		e.Status = resp.StatusCode()
+	}
+	if e.Title == "" && e.Detail == "" && len(e.Errors) == 0 {
+		e.Title = http.StatusText(resp.StatusCode())
+		e.Detail = string(bytes.TrimSpace(resp.Body()))
+	}
+	return e
 }

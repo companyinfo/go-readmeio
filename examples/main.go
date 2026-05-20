@@ -109,7 +109,7 @@ func main() {
 	}
 	fmt.Printf("Created guide: title=%q slug=%q\n", guide.Title, guide.Slug)
 
-	got, err := client.Guides.List(ctx, branch, guide.Slug)
+	got, err := client.Guides.Get(ctx, branch, guide.Slug)
 	if err != nil {
 		log.Fatalf("guides.Get: %v", err)
 	}
@@ -138,7 +138,7 @@ func main() {
 	refCatURI := refCats[0].URI
 
 	ref, err := client.Reference.Create(ctx, branch, readme.ReferenceParams{
-		Title:    "List pets",
+		Title:    "Get pets",
 		Category: &readme.ResourceRef{URI: refCatURI},
 		API: &readme.ReferenceAPI{
 			Method: "get",
@@ -153,7 +153,7 @@ func main() {
 	}
 	fmt.Printf("Created reference: title=%q slug=%q api=%+v\n", ref.Title, ref.Slug, ref.API)
 
-	gotRef, err := client.Reference.List(ctx, branch, ref.Slug)
+	gotRef, err := client.Reference.Get(ctx, branch, ref.Slug)
 	if err != nil {
 		log.Fatalf("reference.Get: %v", err)
 	}

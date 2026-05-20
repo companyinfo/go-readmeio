@@ -24,8 +24,8 @@ type referenceEnvelope struct {
 type ReferenceService interface {
 	// Create creates a new reference page on the given branch.
 	Create(ctx context.Context, branch string, params ReferenceParams) (*Reference, error)
-	// List retrieves a single reference page by its slug on the given branch.
-	List(ctx context.Context, branch, slug string) (*Reference, error)
+	// Get retrieves a single reference page by its slug on the given branch.
+	Get(ctx context.Context, branch, slug string) (*Reference, error)
 	// Update updates an existing reference page identified by its slug. Only
 	// the fields set in params are sent.
 	Update(ctx context.Context, branch, slug string, params ReferenceParams) (*Reference, error)
@@ -71,14 +71,14 @@ func (r *ReferenceClient) Create(ctx context.Context, branch string, params Refe
 		return nil, err
 	}
 	if resp.IsError() {
-		return nil, resp.Error().(*APIError)
+		return nil, apiErrorFromResponse(resp)
 	}
 	return &out.Data, nil
 }
 
-// List retrieves a single reference page by its slug.
+// Get retrieves a single reference page by its slug.
 // ReadMe API v2: GET /branches/{branch}/reference/{slug}
-func (r *ReferenceClient) List(ctx context.Context, branch, slug string) (*Reference, error) {
+func (r *ReferenceClient) Get(ctx context.Context, branch, slug string) (*Reference, error) {
 	if err := check().Branch(branch).Slug(slug).Err(); err != nil {
 		return nil, err
 	}
@@ -96,7 +96,7 @@ func (r *ReferenceClient) List(ctx context.Context, branch, slug string) (*Refer
 		return nil, err
 	}
 	if resp.IsError() {
-		return nil, resp.Error().(*APIError)
+		return nil, apiErrorFromResponse(resp)
 	}
 	return &out.Data, nil
 }
@@ -122,7 +122,7 @@ func (r *ReferenceClient) Update(ctx context.Context, branch, slug string, param
 		return nil, err
 	}
 	if resp.IsError() {
-		return nil, resp.Error().(*APIError)
+		return nil, apiErrorFromResponse(resp)
 	}
 	return &out.Data, nil
 }
@@ -145,7 +145,7 @@ func (r *ReferenceClient) Delete(ctx context.Context, branch, slug string) error
 		return err
 	}
 	if resp.IsError() {
-		return resp.Error().(*APIError)
+		return apiErrorFromResponse(resp)
 	}
 	return nil
 }
