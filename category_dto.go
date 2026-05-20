@@ -38,11 +38,18 @@ type CategoryParams struct {
 	Section CategoryType `json:"section,omitempty"`
 }
 
-// CategorySaved models the response returned by ReadMe after creating or
+// CategorySavedResponse models the response returned by ReadMe after creating or
 // updating a category in API v2.
-type CategorySaved struct {
-	Title   string       `json:"title"`
-	Section CategoryType `json:"section,omitempty"`
-	URI     string       `json:"uri,omitempty"`
-	Links   any          `json:"links,omitempty"`
+type CategorySavedResponse struct {
+	Data struct {
+		Title   string        `json:"title"`
+		Section string        `json:"section"`
+		Links   CategoryLinks `json:"links"`
+		Uri     string        `json:"uri"`
+	} `json:"data"`
+}
+
+// CategoryLinks models the `links` block on a category.
+type CategoryLinks struct {
+	Project string `json:"project"`
 }
