@@ -2,8 +2,6 @@ package readme
 
 import (
 	"context"
-
-	"github.com/go-resty/resty/v2"
 )
 
 // referenceEnvelope wraps single-item responses from the Reference API.
@@ -43,10 +41,6 @@ func NewReferenceClient(c *Client) *ReferenceClient {
 	return &ReferenceClient{client: c}
 }
 
-func (r *ReferenceClient) newRequest(ctx context.Context) *resty.Request {
-	return r.client.HTTPClient.R().SetContext(ctx)
-}
-
 // Create creates a new reference page on the given branch.
 // ReadMe API v2: POST /branches/{branch}/reference
 func (r *ReferenceClient) Create(ctx context.Context, branch string, params ReferenceParams) (*Reference, error) {
@@ -59,7 +53,7 @@ func (r *ReferenceClient) Create(ctx context.Context, branch string, params Refe
 	}
 
 	var out referenceEnvelope
-	resp, err := r.newRequest(ctx).
+	resp, err := r.client.NewRequest(ctx).
 		SetPathParams(map[string]string{
 			"branch": branch,
 		}).
@@ -84,7 +78,7 @@ func (r *ReferenceClient) Get(ctx context.Context, branch, slug string) (*Refere
 	}
 
 	var out referenceEnvelope
-	resp, err := r.newRequest(ctx).
+	resp, err := r.client.NewRequest(ctx).
 		SetPathParams(map[string]string{
 			"branch": branch,
 			"slug":   slug,
@@ -109,7 +103,7 @@ func (r *ReferenceClient) Update(ctx context.Context, branch, slug string, param
 	}
 
 	var out referenceEnvelope
-	resp, err := r.newRequest(ctx).
+	resp, err := r.client.NewRequest(ctx).
 		SetPathParams(map[string]string{
 			"branch": branch,
 			"slug":   slug,
@@ -134,7 +128,7 @@ func (r *ReferenceClient) Delete(ctx context.Context, branch, slug string) error
 		return err
 	}
 
-	resp, err := r.newRequest(ctx).
+	resp, err := r.client.NewRequest(ctx).
 		SetPathParams(map[string]string{
 			"branch": branch,
 			"slug":   slug,

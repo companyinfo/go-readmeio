@@ -2,6 +2,7 @@
 package readme
 
 import (
+	"context"
 	"errors"
 
 	"github.com/go-resty/resty/v2"
@@ -86,7 +87,8 @@ func New(apiKey string, opts ...Option) (*Client, error) {
 	return c, nil
 }
 
-// AuthorizationHeader returns the value to use for the Authorization header.
-func (c *Client) AuthorizationHeader() string {
-	return "Bearer " + c.apiKey
+// NewRequest creates a new Resty request with the provided context applied.
+// Services should use this helper to ensure consistent request setup.
+func (c *Client) NewRequest(ctx context.Context) *resty.Request {
+	return c.HTTPClient.R().SetContext(ctx)
 }

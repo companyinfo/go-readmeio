@@ -2,8 +2,6 @@ package readme
 
 import (
 	"context"
-
-	"github.com/go-resty/resty/v2"
 )
 
 // guideEnvelope wraps single-item responses from the Guides API.
@@ -43,10 +41,6 @@ func NewGuideClient(c *Client) *GuideClient {
 	return &GuideClient{client: c}
 }
 
-func (g *GuideClient) newRequest(ctx context.Context) *resty.Request {
-	return g.client.HTTPClient.R().SetContext(ctx)
-}
-
 // Create creates a new guide on the given branch.
 // ReadMe API v2: POST /branches/{branch}/guides
 func (g *GuideClient) Create(ctx context.Context, branch string, params GuideParams) (*Guide, error) {
@@ -59,7 +53,7 @@ func (g *GuideClient) Create(ctx context.Context, branch string, params GuidePar
 	}
 
 	var out guideEnvelope
-	resp, err := g.newRequest(ctx).
+	resp, err := g.client.NewRequest(ctx).
 		SetPathParams(map[string]string{
 			"branch": branch,
 		}).
@@ -84,7 +78,7 @@ func (g *GuideClient) Get(ctx context.Context, branch, slug string) (*Guide, err
 	}
 
 	var out guideEnvelope
-	resp, err := g.newRequest(ctx).
+	resp, err := g.client.NewRequest(ctx).
 		SetPathParams(map[string]string{
 			"branch": branch,
 			"slug":   slug,
@@ -109,7 +103,7 @@ func (g *GuideClient) Update(ctx context.Context, branch, slug string, params Gu
 	}
 
 	var out guideEnvelope
-	resp, err := g.newRequest(ctx).
+	resp, err := g.client.NewRequest(ctx).
 		SetPathParams(map[string]string{
 			"branch": branch,
 			"slug":   slug,
@@ -134,7 +128,7 @@ func (g *GuideClient) Delete(ctx context.Context, branch, slug string) error {
 		return err
 	}
 
-	resp, err := g.newRequest(ctx).
+	resp, err := g.client.NewRequest(ctx).
 		SetPathParams(map[string]string{
 			"branch": branch,
 			"slug":   slug,

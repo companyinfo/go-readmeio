@@ -3,8 +3,6 @@ package readme
 import (
 	"context"
 	"encoding/json"
-
-	"github.com/go-resty/resty/v2"
 )
 
 // categoryEnvelope wraps responses from the Categories API.
@@ -48,10 +46,6 @@ func NewCategoryClient(c *Client) *CategoryClient {
 	return &CategoryClient{client: c}
 }
 
-func (c *CategoryClient) newRequest(ctx context.Context) *resty.Request {
-	return c.client.HTTPClient.R().SetContext(ctx)
-}
-
 // Create creates a new category on the given branch.
 // ReadMe API v2: POST /branches/{branch}/categories
 func (c *CategoryClient) Create(ctx context.Context, branch string, params CategoryParams) (*Category, error) {
@@ -64,7 +58,7 @@ func (c *CategoryClient) Create(ctx context.Context, branch string, params Categ
 	}
 
 	var env categoryEnvelope
-	resp, err := c.newRequest(ctx).
+	resp, err := c.client.NewRequest(ctx).
 		SetPathParams(map[string]string{
 			"branch": branch,
 		}).
@@ -97,7 +91,7 @@ func (c *CategoryClient) List(ctx context.Context, branch, section string) ([]Ca
 	}
 
 	var env categoryEnvelope
-	resp, err := c.newRequest(ctx).
+	resp, err := c.client.NewRequest(ctx).
 		SetPathParams(map[string]string{
 			"branch":  branch,
 			"section": section,
@@ -132,7 +126,7 @@ func (c *CategoryClient) GetByTitle(ctx context.Context, branch, section, title 
 	}
 
 	var env categoryEnvelope
-	resp, err := c.newRequest(ctx).
+	resp, err := c.client.NewRequest(ctx).
 		SetPathParams(map[string]string{
 			"branch":  branch,
 			"section": section,
@@ -167,7 +161,7 @@ func (c *CategoryClient) Update(ctx context.Context, branch, section, title stri
 	}
 
 	var env categoryEnvelope
-	resp, err := c.newRequest(ctx).
+	resp, err := c.client.NewRequest(ctx).
 		SetPathParams(map[string]string{
 			"branch":  branch,
 			"section": section,
@@ -202,7 +196,7 @@ func (c *CategoryClient) Delete(ctx context.Context, branch, section, title stri
 		return err
 	}
 
-	resp, err := c.newRequest(ctx).
+	resp, err := c.client.NewRequest(ctx).
 		SetPathParams(map[string]string{
 			"branch":  branch,
 			"section": section,

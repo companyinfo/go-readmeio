@@ -4,14 +4,12 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
-
-	"github.com/go-resty/resty/v2"
 )
 
 // newTestClient builds a goreadme.Client pointing at the provided httptest server.
 func newTestClient(t *testing.T, srv *httptest.Server) *Client {
 	t.Helper()
-	c, err := New("test-token", WithBaseURL(srv.URL), WithHTTPClient(resty.New()))
+	c, err := New("test-token", WithBaseURL(srv.URL))
 	if err != nil {
 		t.Fatalf("New() failed: %v", err)
 	}
