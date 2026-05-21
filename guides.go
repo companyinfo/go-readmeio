@@ -4,8 +4,8 @@ import (
 	"context"
 )
 
-// guideEnvelope wraps single-item responses from the Guides API.
-type guideEnvelope struct {
+// guideResponse wraps single-item responses from the Guides API.
+type guideResponse struct {
 	Data Guide `json:"data"`
 }
 
@@ -52,7 +52,7 @@ func (g *GuideClient) Create(ctx context.Context, branch string, params GuidePar
 		return nil, err
 	}
 
-	var out guideEnvelope
+	var out guideResponse
 	resp, err := g.client.NewRequest(ctx).
 		SetPathParams(map[string]string{
 			"branch": branch,
@@ -77,7 +77,7 @@ func (g *GuideClient) Get(ctx context.Context, branch, slug string) (*Guide, err
 		return nil, err
 	}
 
-	var out guideEnvelope
+	var out guideResponse
 	resp, err := g.client.NewRequest(ctx).
 		SetPathParams(map[string]string{
 			"branch": branch,
@@ -102,7 +102,7 @@ func (g *GuideClient) Update(ctx context.Context, branch, slug string, params Gu
 		return nil, err
 	}
 
-	var out guideEnvelope
+	var out guideResponse
 	resp, err := g.client.NewRequest(ctx).
 		SetPathParams(map[string]string{
 			"branch": branch,

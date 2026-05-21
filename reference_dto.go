@@ -14,10 +14,10 @@ type Reference struct {
 	State         string                `json:"state,omitempty"` // "current" | "deprecated"
 	Position      int                   `json:"position,omitempty"`
 	APIConfig     string                `json:"api_config,omitempty"`
-	API           *ReferenceAPI         `json:"api,omitempty"` // reference-only block
+	API           *ReferenceAPI         `json:"api,omitempty"`
 	Content       GuideContent          `json:"content,omitempty"`
-	Category      ResourceRef           `json:"category,omitempty"` // { uri: "..." }
-	Parent        *ResourceRef          `json:"parent,omitempty"`   // { uri: "..." } or null
+	Category      ResourceRef           `json:"category"`
+	Parent        *ResourceRef          `json:"parent,omitempty"`
 	Privacy       GuidePrivacy          `json:"privacy,omitempty"`
 	Appearance    GuideAppearance       `json:"appearance,omitempty"`
 	Metadata      ReferenceMetadata     `json:"metadata,omitempty"`

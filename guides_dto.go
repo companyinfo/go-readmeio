@@ -109,12 +109,14 @@ type GuideAppearance struct {
 
 // GuideMetadata models the SEO metadata block (replaces v1 flat SEO fields).
 type GuideMetadata struct {
-	Title       string `json:"title,omitempty"`
-	Description string `json:"description,omitempty"`
-	Image       struct {
-		URI string `json:"uri,omitempty"`
-	} `json:"image,omitempty"`
-	Keywords string `json:"keywords,omitempty"`
+	Title       string     `json:"title,omitempty"`
+	Description string     `json:"description,omitempty"`
+	Image       GuideImage `json:"image,omitempty"`
+	Keywords    string     `json:"keywords,omitempty"`
+}
+
+type GuideImage struct {
+	URI string `json:"uri,omitempty"`
 }
 
 // AllowCrawlers restricts allowed values for allow_crawlers in GuideParams.
@@ -128,7 +130,7 @@ const (
 // GuideParams is the request body for create/update.
 // Update sends only the fields explicitly supplied (omitempty).
 type GuideParams struct {
-	Slug          string           `json:"slug,omitempty"` // optional override
+	Slug          string           `json:"slug,omitempty"`
 	Title         string           `json:"title,omitempty"`
 	Type          string           `json:"type,omitempty"`
 	State         string           `json:"state,omitempty"`

@@ -4,8 +4,8 @@ import (
 	"context"
 )
 
-// referenceEnvelope wraps single-item responses from the Reference API.
-type referenceEnvelope struct {
+// referenceResponse wraps single-item responses from the Reference API.
+type referenceResponse struct {
 	Data Reference `json:"data"`
 }
 
@@ -52,7 +52,7 @@ func (r *ReferenceClient) Create(ctx context.Context, branch string, params Refe
 		return nil, err
 	}
 
-	var out referenceEnvelope
+	var out referenceResponse
 	resp, err := r.client.NewRequest(ctx).
 		SetPathParams(map[string]string{
 			"branch": branch,
@@ -77,7 +77,7 @@ func (r *ReferenceClient) Get(ctx context.Context, branch, slug string) (*Refere
 		return nil, err
 	}
 
-	var out referenceEnvelope
+	var out referenceResponse
 	resp, err := r.client.NewRequest(ctx).
 		SetPathParams(map[string]string{
 			"branch": branch,
@@ -102,7 +102,7 @@ func (r *ReferenceClient) Update(ctx context.Context, branch, slug string, param
 		return nil, err
 	}
 
-	var out referenceEnvelope
+	var out referenceResponse
 	resp, err := r.client.NewRequest(ctx).
 		SetPathParams(map[string]string{
 			"branch": branch,

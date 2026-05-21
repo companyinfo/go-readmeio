@@ -5,10 +5,10 @@ import (
 	"encoding/json"
 )
 
-// categoryEnvelope wraps responses from the Categories API.
+// categoryResponse wraps responses from the Categories API.
 // It supports both list responses (data: [ ... ]) and single-item responses (data: { ... })
 // by keeping the raw JSON for post-processing.
-type categoryEnvelope struct {
+type categoryResponse struct {
 	Data json.RawMessage `json:"data"`
 }
 
@@ -57,7 +57,7 @@ func (c *CategoryClient) Create(ctx context.Context, branch string, params Categ
 		return nil, err
 	}
 
-	var env categoryEnvelope
+	var env categoryResponse
 	resp, err := c.client.NewRequest(ctx).
 		SetPathParams(map[string]string{
 			"branch": branch,
@@ -91,7 +91,7 @@ func (c *CategoryClient) List(ctx context.Context, branch string, section Catego
 		return nil, err
 	}
 
-	var env categoryEnvelope
+	var env categoryResponse
 	resp, err := c.client.NewRequest(ctx).
 		SetPathParams(map[string]string{
 			"branch":  branch,
@@ -127,7 +127,7 @@ func (c *CategoryClient) GetByTitle(ctx context.Context, branch string, section 
 		return nil, err
 	}
 
-	var env categoryEnvelope
+	var env categoryResponse
 	resp, err := c.client.NewRequest(ctx).
 		SetPathParams(map[string]string{
 			"branch":  branch,
@@ -163,7 +163,7 @@ func (c *CategoryClient) Update(ctx context.Context, branch string, section Cate
 		return nil, err
 	}
 
-	var env categoryEnvelope
+	var env categoryResponse
 	resp, err := c.client.NewRequest(ctx).
 		SetPathParams(map[string]string{
 			"branch":  branch,
