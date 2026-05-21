@@ -21,8 +21,8 @@ type Client struct {
 	HTTPClient *resty.Client
 	// BaseURL is the API base URL. Defaults to https://api.readme.com/v2.
 	BaseURL string
-	// apiKey is the ReadMe API key used for Bearer authentication.
-	apiKey string
+	// ApiKey is the ReadMe API key used for Bearer authentication.
+	ApiKey string
 	// Categories is the service for accessing categories.
 	Categories CategoryService
 	// Guides is the service for accessing guides.
@@ -53,18 +53,18 @@ func WithHTTPClient(hc *resty.Client) Option {
 }
 
 // New creates a new ReadMe API v2 client using Bearer authentication.
-// The provided apiKey must be a valid ReadMe API key.
+// The provided ApiKey must be a valid ReadMe API key.
 // By default, the client uses a resty.Client and is configured to talk to https://api.readme.com/v2.
 // You can customize these with options.
 func New(apiKey string, opts ...Option) (*Client, error) {
 	if apiKey == "" {
-		return nil, errors.New("apiKey is required")
+		return nil, errors.New("ApiKey is required")
 	}
 
 	c := &Client{
 		HTTPClient: resty.New(),
 		BaseURL:    defaultBaseURL,
-		apiKey:     apiKey,
+		ApiKey:     apiKey,
 	}
 
 	for _, opt := range opts {
