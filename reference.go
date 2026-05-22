@@ -2,6 +2,7 @@ package readme
 
 import (
 	"context"
+	"errors"
 )
 
 // referenceResponse wraps single-item responses from the Reference API.
@@ -44,11 +45,10 @@ func NewReferenceClient(c *Client) *ReferenceClient {
 // Create creates a new reference page on the given branch.
 // ReadMe API v2: POST /branches/{branch}/reference
 func (r *ReferenceClient) Create(ctx context.Context, branch string, params ReferenceParams) (*Reference, error) {
-	if err := check().
-		Branch(branch).
-		Title(params.Title).
-		Category(params.Category).
-		Err(); err != nil {
+	if branch == "" {
+		return nil, errors.New("branch is required")
+	}
+	if err := validateParams(params); err != nil {
 		return nil, err
 	}
 
@@ -73,8 +73,11 @@ func (r *ReferenceClient) Create(ctx context.Context, branch string, params Refe
 // Get retrieves a single reference page by its slug.
 // ReadMe API v2: GET /branches/{branch}/reference/{slug}
 func (r *ReferenceClient) Get(ctx context.Context, branch, slug string) (*Reference, error) {
-	if err := check().Branch(branch).Slug(slug).Err(); err != nil {
-		return nil, err
+	if branch == "" {
+		return nil, errors.New("branch is required")
+	}
+	if slug == "" {
+		return nil, errors.New("slug is required")
 	}
 
 	var out referenceResponse
@@ -98,8 +101,11 @@ func (r *ReferenceClient) Get(ctx context.Context, branch, slug string) (*Refere
 // Update updates an existing reference page identified by its slug.
 // ReadMe API v2: PATCH /branches/{branch}/reference/{slug}
 func (r *ReferenceClient) Update(ctx context.Context, branch, slug string, params ReferenceParams) (*Reference, error) {
-	if err := check().Branch(branch).Slug(slug).Err(); err != nil {
-		return nil, err
+	if branch == "" {
+		return nil, errors.New("branch is required")
+	}
+	if slug == "" {
+		return nil, errors.New("slug is required")
 	}
 
 	var out referenceResponse
@@ -124,8 +130,11 @@ func (r *ReferenceClient) Update(ctx context.Context, branch, slug string, param
 // Delete removes a reference page identified by its slug.
 // ReadMe API v2: DELETE /branches/{branch}/reference/{slug}
 func (r *ReferenceClient) Delete(ctx context.Context, branch, slug string) error {
-	if err := check().Branch(branch).Slug(slug).Err(); err != nil {
-		return err
+	if branch == "" {
+		return errors.New("branch is required")
+	}
+	if slug == "" {
+		return errors.New("slug is required")
 	}
 
 	resp, err := r.client.NewRequest(ctx).

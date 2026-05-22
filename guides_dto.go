@@ -48,8 +48,12 @@ type GuideNextPage struct {
 }
 
 // ResourceRef is a generic { uri } reference to another v2 resource.
+//
+// The `uri` field is required whenever a ResourceRef is supplied; optional
+// references should be modeled as `*ResourceRef` with a `omitempty` JSON
+// tag so the whole block can be absent.
 type ResourceRef struct {
-	URI string `json:"uri"`
+	URI string `json:"uri" validate:"required"`
 }
 
 // GuideHRef models the set of helpful links for a guide.
@@ -128,15 +132,22 @@ const (
 )
 
 // GuideParams is the request body for create/update.
-// Update sends only the fields explicitly supplied (omitempty).
+//
+// Validation tags (consumed by go-playground/validator) describe the
+// requirements for the **Create** endpoint:
+//   - `title` and `category` (with a non-empty `category.uri`) are required.
+//
+// Update sends only the fields explicitly supplied (omitempty) and is not
+// run through struct validation, so optional `*ResourceRef` parents and
+// other absent fields are accepted.
 type GuideParams struct {
 	Slug          string           `json:"slug,omitempty"`
-	Title         string           `json:"title,omitempty"`
+	Title         string           `json:"title,omitempty" validate:"required"`
 	Type          string           `json:"type,omitempty"`
 	State         string           `json:"state,omitempty"`
 	Position      *int             `json:"position,omitempty"`
 	Content       *GuideContent    `json:"content,omitempty"`
-	Category      *ResourceRef     `json:"category,omitempty"`
+	Category      *ResourceRef     `json:"category,omitempty" validate:"required"`
 	Parent        *ResourceRef     `json:"parent,omitempty"`
 	Privacy       *GuidePrivacy    `json:"privacy,omitempty"`
 	Appearance    *GuideAppearance `json:"appearance,omitempty"`

@@ -100,17 +100,23 @@ type ReferenceMetadata struct {
 }
 
 // ReferenceParams is the request body for create/update.
-// Update sends only the fields explicitly supplied (omitempty).
+//
+// Validation tags (consumed by go-playground/validator) describe the
+// requirements for the **Create** endpoint:
+//   - `title` and `category` (with a non-empty `category.uri`) are required.
+//
+// Update sends only the fields explicitly supplied (omitempty) and is not
+// run through struct validation.
 type ReferenceParams struct {
 	Slug          string             `json:"slug,omitempty"` // optional override
-	Title         string             `json:"title,omitempty"`
+	Title         string             `json:"title,omitempty" validate:"required"`
 	Type          string             `json:"type,omitempty"`
 	State         string             `json:"state,omitempty"`
 	Position      *int               `json:"position,omitempty"`
 	APIConfig     *string            `json:"api_config,omitempty"`
 	API           *ReferenceAPI      `json:"api,omitempty"`
 	Content       *GuideContent      `json:"content,omitempty"`
-	Category      *ResourceRef       `json:"category,omitempty"`
+	Category      *ResourceRef       `json:"category,omitempty" validate:"required"`
 	Parent        *ResourceRef       `json:"parent,omitempty"`
 	Privacy       *GuidePrivacy      `json:"privacy,omitempty"`
 	Appearance    *GuideAppearance   `json:"appearance,omitempty"`

@@ -2,6 +2,7 @@ package readme
 
 import (
 	"context"
+	"errors"
 )
 
 // guideResponse wraps single-item responses from the Guides API.
@@ -44,11 +45,10 @@ func NewGuideClient(c *Client) *GuideClient {
 // Create creates a new guide on the given branch.
 // ReadMe API v2: POST /branches/{branch}/guides
 func (g *GuideClient) Create(ctx context.Context, branch string, params GuideParams) (*Guide, error) {
-	if err := check().
-		Branch(branch).
-		Title(params.Title).
-		Category(params.Category).
-		Err(); err != nil {
+	if branch == "" {
+		return nil, errors.New("branch is required")
+	}
+	if err := validateParams(params); err != nil {
 		return nil, err
 	}
 
@@ -73,8 +73,11 @@ func (g *GuideClient) Create(ctx context.Context, branch string, params GuidePar
 // Get retrieves a single guide by its slug.
 // ReadMe API v2: GET /branches/{branch}/guides/{slug}
 func (g *GuideClient) Get(ctx context.Context, branch, slug string) (*Guide, error) {
-	if err := check().Branch(branch).Slug(slug).Err(); err != nil {
-		return nil, err
+	if branch == "" {
+		return nil, errors.New("branch is required")
+	}
+	if slug == "" {
+		return nil, errors.New("slug is required")
 	}
 
 	var out guideResponse
@@ -98,8 +101,11 @@ func (g *GuideClient) Get(ctx context.Context, branch, slug string) (*Guide, err
 // Update updates an existing guide identified by its slug.
 // ReadMe API v2: PATCH /branches/{branch}/guides/{slug}
 func (g *GuideClient) Update(ctx context.Context, branch, slug string, params GuideParams) (*Guide, error) {
-	if err := check().Branch(branch).Slug(slug).Err(); err != nil {
-		return nil, err
+	if branch == "" {
+		return nil, errors.New("branch is required")
+	}
+	if slug == "" {
+		return nil, errors.New("slug is required")
 	}
 
 	var out guideResponse
@@ -124,8 +130,11 @@ func (g *GuideClient) Update(ctx context.Context, branch, slug string, params Gu
 // Delete removes a guide identified by its slug.
 // ReadMe API v2: DELETE /branches/{branch}/guides/{slug}
 func (g *GuideClient) Delete(ctx context.Context, branch, slug string) error {
-	if err := check().Branch(branch).Slug(slug).Err(); err != nil {
-		return err
+	if branch == "" {
+		return errors.New("branch is required")
+	}
+	if slug == "" {
+		return errors.New("slug is required")
 	}
 
 	resp, err := g.client.NewRequest(ctx).

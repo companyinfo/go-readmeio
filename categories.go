@@ -3,6 +3,7 @@ package readme
 import (
 	"context"
 	"encoding/json"
+	"errors"
 )
 
 // categoryResponse wraps responses from the Categories API.
@@ -49,11 +50,10 @@ func NewCategoryClient(c *Client) *CategoryClient {
 // Create creates a new category on the given branch.
 // ReadMe API v2: POST /branches/{branch}/categories
 func (c *CategoryClient) Create(ctx context.Context, branch string, params CategoryParams) (*Category, error) {
-	if err := check().
-		Branch(branch).
-		Title(params.Title).
-		Section(params.Section, nil).
-		Err(); err != nil {
+	if branch == "" {
+		return nil, errors.New("branch is required")
+	}
+	if err := validateParams(params); err != nil {
 		return nil, err
 	}
 
@@ -83,13 +83,13 @@ func (c *CategoryClient) Create(ctx context.Context, branch string, params Categ
 // List retrieves all categories on the given branch for the given section.
 // ReadMe API v2: GET /branches/{branch}/categories/{section}
 func (c *CategoryClient) List(ctx context.Context, branch string, section CategoryType) ([]Category, error) {
-	var sec string
-	if err := check().
-		Branch(branch).
-		Section(section, &sec).
-		Err(); err != nil {
+	if branch == "" {
+		return nil, errors.New("branch is required")
+	}
+	if err := validateSection(section); err != nil {
 		return nil, err
 	}
+	sec := canonSection(section)
 
 	var env categoryResponse
 	resp, err := c.client.NewRequest(ctx).
@@ -118,14 +118,16 @@ func (c *CategoryClient) List(ctx context.Context, branch string, section Catego
 // identifier within a (branch, section) pair.
 // ReadMe API v2: GET /branches/{branch}/categories/{section}/{title}
 func (c *CategoryClient) GetByTitle(ctx context.Context, branch string, section CategoryType, title string) (*Category, error) {
-	var sec string
-	if err := check().
-		Branch(branch).
-		Section(section, &sec).
-		Title(title).
-		Err(); err != nil {
+	if branch == "" {
+		return nil, errors.New("branch is required")
+	}
+	if err := validateSection(section); err != nil {
 		return nil, err
 	}
+	if title == "" {
+		return nil, errors.New("title is required")
+	}
+	sec := canonSection(section)
 
 	var env categoryResponse
 	resp, err := c.client.NewRequest(ctx).
@@ -154,14 +156,16 @@ func (c *CategoryClient) GetByTitle(ctx context.Context, branch string, section 
 // Update updates an existing category identified by its title.
 // ReadMe API v2: PATCH /branches/{branch}/categories/{section}/{title}
 func (c *CategoryClient) Update(ctx context.Context, branch string, section CategoryType, title string, params CategoryParams) (*Category, error) {
-	var sec string
-	if err := check().
-		Branch(branch).
-		Section(section, &sec).
-		Title(title).
-		Err(); err != nil {
+	if branch == "" {
+		return nil, errors.New("branch is required")
+	}
+	if err := validateSection(section); err != nil {
 		return nil, err
 	}
+	if title == "" {
+		return nil, errors.New("title is required")
+	}
+	sec := canonSection(section)
 
 	var env categoryResponse
 	resp, err := c.client.NewRequest(ctx).
@@ -191,14 +195,16 @@ func (c *CategoryClient) Update(ctx context.Context, branch string, section Cate
 // Delete removes a category identified by its title.
 // ReadMe API v2: DELETE /branches/{branch}/categories/{section}/{title}
 func (c *CategoryClient) Delete(ctx context.Context, branch string, section CategoryType, title string) error {
-	var sec string
-	if err := check().
-		Branch(branch).
-		Section(section, &sec).
-		Title(title).
-		Err(); err != nil {
+	if branch == "" {
+		return errors.New("branch is required")
+	}
+	if err := validateSection(section); err != nil {
 		return err
 	}
+	if title == "" {
+		return errors.New("title is required")
+	}
+	sec := canonSection(section)
 
 	resp, err := c.client.NewRequest(ctx).
 		SetPathParams(map[string]string{
