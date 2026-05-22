@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-// newTestClient builds a goreadme.Client pointing at the provided httptest server.
+// newTestClient builds a readme.Client pointing at the provided httptest server.
 func newTestClient(t *testing.T, srv *httptest.Server) *Client {
 	t.Helper()
 	c, err := New("test-token", WithBaseURL(srv.URL))
