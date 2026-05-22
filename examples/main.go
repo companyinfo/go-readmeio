@@ -1,4 +1,4 @@
-// Example flow demonstrating how to use the goreadme client against the
+// Example flow demonstrating how to use the readme client against the
 // ReadMe API v2. It walks through:
 //
 //  1. Constructing a Client with an API key (and optionally a custom base URL).
@@ -59,16 +59,16 @@ func main() {
 	// ---------------------------------------------------------------------
 	guideCats, err := client.Categories.List(ctx, branch, readme.CategoryTypeGuides)
 	if err != nil {
-		log.Fatalf("categories.Get(guides): %v", err)
+		log.Fatalf("categories.List(guides): %v", err)
 	}
 	fmt.Printf("Fetched %d guide categories on branch %q\n", len(guideCats), branch)
 	for i, c := range guideCats {
 		fmt.Printf("  %d. %s (uri=%s)\n", i+1, c.Title, c.URI)
 	}
 
-	refCats, err := client.Categories.List(ctx, branch, "reference")
+	refCats, err := client.Categories.List(ctx, branch, readme.CategoryTypeReference)
 	if err != nil {
-		log.Fatalf("categories.Get(reference): %v", err)
+		log.Fatalf("categories.List(reference): %v", err)
 	}
 	fmt.Printf("Fetched %d reference categories on branch %q\n", len(refCats), branch)
 
@@ -97,11 +97,11 @@ func main() {
 	guideCatURI := guideCats[0].URI
 
 	guide, err := client.Guides.Create(ctx, branch, readme.GuideParams{
-		Title:    "Hello from goreadme",
+		Title:    "Hello from readme",
 		Category: &readme.ResourceRef{URI: guideCatURI},
 		Content: &readme.GuideContent{
-			Body:    "# Hello\n\nCreated by the goreadme example.",
-			Excerpt: "Example guide created via goreadme.",
+			Body:    "# Hello\n\nCreated by the readme example.",
+			Excerpt: "Example guide created via readme.",
 		},
 	})
 	if err != nil {
@@ -116,7 +116,7 @@ func main() {
 	fmt.Printf("Fetched guide: title=%q\n", got.Title)
 
 	updated, err := client.Guides.Update(ctx, branch, guide.Slug, readme.GuideParams{
-		Title: "Hello from goreadme (updated)",
+		Title: "Hello from readme (updated)",
 	})
 	if err != nil {
 		log.Fatalf("guides.Update: %v", err)
