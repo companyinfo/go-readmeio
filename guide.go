@@ -42,11 +42,19 @@ func NewGuideClient(c *Client) *GuideClient {
 	return &GuideClient{client: c}
 }
 
+// validateSlug ensures the slug path parameter is supplied.
+func validateSlug(slug string) error {
+	if slug == "" {
+		return errors.New("slug is required")
+	}
+	return nil
+}
+
 // Create creates a new guide on the given branch.
 // ReadMe API v2: POST /branches/{branch}/guides
 func (g *GuideClient) Create(ctx context.Context, branch string, params GuideParams) (*Guide, error) {
-	if branch == "" {
-		return nil, errors.New("branch is required")
+	if err := validateBranch(branch); err != nil {
+		return nil, err
 	}
 	if err := validateParams(params); err != nil {
 		return nil, err
@@ -73,11 +81,11 @@ func (g *GuideClient) Create(ctx context.Context, branch string, params GuidePar
 // Get retrieves a single guide by its slug.
 // ReadMe API v2: GET /branches/{branch}/guides/{slug}
 func (g *GuideClient) Get(ctx context.Context, branch, slug string) (*Guide, error) {
-	if branch == "" {
-		return nil, errors.New("branch is required")
+	if err := validateBranch(branch); err != nil {
+		return nil, err
 	}
-	if slug == "" {
-		return nil, errors.New("slug is required")
+	if err := validateSlug(slug); err != nil {
+		return nil, err
 	}
 
 	var out guideResponse
@@ -101,11 +109,11 @@ func (g *GuideClient) Get(ctx context.Context, branch, slug string) (*Guide, err
 // Update updates an existing guide identified by its slug.
 // ReadMe API v2: PATCH /branches/{branch}/guides/{slug}
 func (g *GuideClient) Update(ctx context.Context, branch, slug string, params GuideParams) (*Guide, error) {
-	if branch == "" {
-		return nil, errors.New("branch is required")
+	if err := validateBranch(branch); err != nil {
+		return nil, err
 	}
-	if slug == "" {
-		return nil, errors.New("slug is required")
+	if err := validateSlug(slug); err != nil {
+		return nil, err
 	}
 
 	var out guideResponse
@@ -130,11 +138,11 @@ func (g *GuideClient) Update(ctx context.Context, branch, slug string, params Gu
 // Delete removes a guide identified by its slug.
 // ReadMe API v2: DELETE /branches/{branch}/guides/{slug}
 func (g *GuideClient) Delete(ctx context.Context, branch, slug string) error {
-	if branch == "" {
-		return errors.New("branch is required")
+	if err := validateBranch(branch); err != nil {
+		return err
 	}
-	if slug == "" {
-		return errors.New("slug is required")
+	if err := validateSlug(slug); err != nil {
+		return err
 	}
 
 	resp, err := g.client.NewRequest(ctx).
