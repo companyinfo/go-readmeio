@@ -52,7 +52,7 @@ func (e APIError) Error() string {
 // the body is missing or not a valid APIError payload.
 func apiErrorFromResponse(resp *resty.Response) error {
 	if resp == nil {
-		return &APIError{Title: "unknown error", Detail: "the response was nil"}
+		return &APIError{Title: "unknown error", Detail: "the response was empty"}
 	}
 
 	e := &APIError{}
