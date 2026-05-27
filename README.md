@@ -1,4 +1,4 @@
-# readme
+# go-readmeio
 
 A Go client for the ReadMe API v2 that provides typed DTOs and convenient services for common Docs operations:
 - Categories (create, list, get-by-title, update, delete)
@@ -18,7 +18,7 @@ This SDK wraps JSON:API-style payloads with idiomatic Go types and adds light cl
 ## Installation
 
 ```
-go get github.com/companyinfo/readme@latest
+go get github.com/companyinfo/go-readmeio@latest
 ```
 
 Requires Go 1.21+.
@@ -34,7 +34,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/companyinfo/readme"
+	"github.com/companyinfo/go-readmeio"
 )
 
 func main() {
