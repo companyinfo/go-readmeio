@@ -18,7 +18,7 @@ This SDK wraps JSON:API-style payloads with idiomatic Go types and adds light cl
 ## Installation
 
 ```
-go get go.companyinfo.dev/readmeio@latest
+go get go.companyinfo.dev/go-readmeio@latest
 ```
 
 Requires Go 1.21+.
@@ -34,7 +34,7 @@ import (
 	"log"
 	"os"
 
-	"go.companyinfo.dev/readmeio"
+	"go.companyinfo.dev/go-readmeio"
 )
 
 func main() {

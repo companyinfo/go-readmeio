@@ -29,7 +29,7 @@ import (
 	"os"
 	"time"
 
-	"go.companyinfo.dev/readmeio"
+	"go.companyinfo.dev/go-readmeio"
 )
 
 func envOr(key, fallback string) string {
