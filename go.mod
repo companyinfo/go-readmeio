@@ -1,4 +1,4 @@
-module github.com/companyinfo/go-readmeio
+module go.companyinfo.dev/readmeio
 
 go 1.25.3
 
