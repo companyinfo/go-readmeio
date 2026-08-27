@@ -63,7 +63,7 @@ func (a *APIDefinitionClient) Create(ctx context.Context, branch string, params 
 			"branch": branch,
 		}).
 		//TODO fix this for the other params.
-		SetMultipartField("schema", "openapi.json", "application/json",
+		SetMultipartField("schema", params.FileName, "application/json",
 			strings.NewReader(params.Schema)).
 		SetResult(&out).
 		SetError(&APIError{}).

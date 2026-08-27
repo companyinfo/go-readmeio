@@ -17,6 +17,7 @@ type APIDefinition struct {
 //   - https://docs.readme.com/main/reference/validateapi
 type APIDefinitionParams struct {
 	// Schema is the OpenAPI or Swagger specification as a string (JSON or YAML).
+	FileName     string `json:"filename"`
 	Schema       string `json:"schema"`
 	UploadSource string `json:"upload_source"`
 	Url          string `json:"url"`
