@@ -21,7 +21,7 @@ type apiDefinitionResponse struct {
 //   - https://docs.readme.com/main/reference/validateapi
 type APIDefinitionService interface {
 	// Create uploads a new API definition (OpenAPI/Swagger) to the given branch.
-	Create(ctx context.Context, branch string, params APIDefinitionParams) (*APIDefinition, error)
+	Create(ctx context.Context, branch string, params APIDefinitionParams) error
 	// Get retrieves a single API definition by its filename.
 	Get(ctx context.Context, branch, filename string) (*APIDefinition, error)
 	// Update updates an existing API definition identified by its filename.
