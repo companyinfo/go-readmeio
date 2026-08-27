@@ -3,6 +3,7 @@ package readme
 import (
 	"context"
 	"errors"
+	"strings"
 )
 
 // apiDefinitionResponse wraps single-item responses from the API Definition API.
@@ -48,12 +49,12 @@ func NewAPIDefinitionClient(c *Client) *APIDefinitionClient {
 
 // Create uploads a new API definition to the given branch.
 // ReadMe API v2: POST /branches/{branch}/api-specification
-func (a *APIDefinitionClient) Create(ctx context.Context, branch string, params APIDefinitionParams) (*APIDefinition, error) {
+func (a *APIDefinitionClient) Create(ctx context.Context, branch string, params APIDefinitionParams) error {
 	if err := validateBranch(branch); err != nil {
-		return nil, err
+		return err
 	}
 	if err := validateParams(params); err != nil {
-		return nil, err
+		return err
 	}
 
 	var out apiDefinitionResponse
@@ -61,18 +62,19 @@ func (a *APIDefinitionClient) Create(ctx context.Context, branch string, params 
 		SetPathParams(map[string]string{
 			"branch": branch,
 		}).
-		SetBody(params).
+		//TODO fix this for the other params.
+		SetMultipartField("schema", "openapi.json", "application/json",
+			strings.NewReader(params.Schema)).
 		SetResult(&out).
 		SetError(&APIError{}).
-		SetHeader("Content-Type", "multipart/form-data").
 		Post("/branches/{branch}/apis")
 	if err != nil {
-		return nil, err
+		return err
 	}
 	if resp.IsError() {
-		return nil, apiErrorFromResponse(resp)
+		return apiErrorFromResponse(resp)
 	}
-	return &out.Data, nil
+	return nil
 }
 
 // Get retrieves a single API definition by its filename.
