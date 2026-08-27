@@ -64,6 +64,7 @@ func (a *APIDefinitionClient) Create(ctx context.Context, branch string, params 
 		SetBody(params).
 		SetResult(&out).
 		SetError(&APIError{}).
+		SetHeader("Content-Type", "multipart/form-data").
 		Post("/branches/{branch}/apis")
 	if err != nil {
 		return nil, err
