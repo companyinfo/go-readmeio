@@ -125,6 +125,7 @@ func (a *APIDefinitionClient) Update(ctx context.Context, branch, filename strin
 			"branch":   branch,
 			"filename": filename,
 		}).
+		SetMultipartField("schema", params.FileName, "application/json", strings.NewReader(params.Schema)).
 		SetBody(params).
 		SetResult(&out).
 		SetError(&APIError{}).
