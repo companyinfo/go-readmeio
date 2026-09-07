@@ -22,10 +22,3 @@ type APIDefinitionParams struct {
 	UploadSource string `json:"upload_source,omitzero"`
 	Url          string `json:"url,omitzero"`
 }
-
-// APIDefinitionValidation represents the result of validating an API definition.
-type APIDefinitionValidation struct {
-	Valid    bool     `json:"valid"`
-	Errors   []string `json:"errors,omitempty"`
-	Warnings []string `json:"warnings,omitempty"`
-}

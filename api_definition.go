@@ -29,12 +29,12 @@ type APIDefinitionService interface {
 	// Delete removes an API definition identified by its filename.
 	Delete(ctx context.Context, branch, filename string) error
 	// Validate validates an API definition without uploading it.
-	Validate(ctx context.Context, branch string, params APIDefinitionParams) (*APIDefinitionValidation, error)
+	Validate(ctx context.Context, branch string, params APIDefinitionParams) (string, error)
 }
 
 // apiDefinitionValidationResponse wraps responses from the API Definition Validation API.
 type apiDefinitionValidationResponse struct {
-	Data APIDefinitionValidation `json:"data"`
+	Data string `json:"data"`
 }
 
 // APIDefinitionClient implements APIDefinitionService.
@@ -187,20 +187,18 @@ func (a *APIDefinitionClient) Delete(ctx context.Context, branch, filename strin
 
 // Validate validates an API definition without uploading it.
 // ReadMe API v2: POST /branches/{branch}/api-specification/validate
-func (a *APIDefinitionClient) Validate(ctx context.Context, branch string, params APIDefinitionParams) (*APIDefinitionValidation, error) {
+func (a *APIDefinitionClient) Validate(ctx context.Context, branch string, params APIDefinitionParams) (string, error) {
 	if err := validateBranch(branch); err != nil {
-		return nil, err
+		return "", err
 	}
 	if err := validateParams(params); err != nil {
-		return nil, err
+		return "", err
 	}
 
-	var out apiDefinitionValidationResponse
 	req := a.client.NewRequest(ctx).
 		SetPathParams(map[string]string{
 			"branch": branch,
 		}).
-		SetResult(&out).
 		SetError(&APIError{})
 
 	if params.Schema != "" {
@@ -216,10 +214,10 @@ func (a *APIDefinitionClient) Validate(ctx context.Context, branch string, param
 
 	resp, err := req.Post("/validate/api")
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 	if resp.IsError() {
-		return nil, apiErrorFromResponse(resp)
+		return "", apiErrorFromResponse(resp)
 	}
-	return &out.Data, nil
+	return string(resp.Body()), nil
 }
