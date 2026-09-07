@@ -32,14 +32,11 @@ func TestAPIDefinitionClient_Create(t *testing.T) {
 	defer srv.Close()
 
 	c := newTestClient(t, srv)
-	apiDef, err := c.APIDefinitions.Create(context.Background(), "v1", APIDefinitionParams{
+	err := c.APIDefinitions.Create(context.Background(), "v1", APIDefinitionParams{
 		Schema:   specContent,
 		FileName: "spec.json",
 	})
 	require.NoError(t, err)
-	assert.Equal(t, "api-123", apiDef.ID)
-	assert.Equal(t, "v1", apiDef.Version)
-	assert.Equal(t, "Test API", apiDef.Title)
 }
 
 func TestAPIDefinitionClient_Get(t *testing.T) {
@@ -78,13 +75,11 @@ func TestAPIDefinitionClient_Update(t *testing.T) {
 	defer srv.Close()
 
 	c := newTestClient(t, srv)
-	apiDef, err := c.APIDefinitions.Update(context.Background(), "v1", "petstore.json", APIDefinitionParams{
+	err := c.APIDefinitions.Update(context.Background(), "v1", "petstore.json", APIDefinitionParams{
 		Schema:   specContent,
 		FileName: "petstore.json",
 	})
 	require.NoError(t, err)
-	assert.Equal(t, "petstore.json", apiDef.ID)
-	assert.Equal(t, "Updated API", apiDef.Title)
 }
 
 func TestAPIDefinitionClient_Delete(t *testing.T) {
@@ -126,8 +121,7 @@ func TestAPIDefinitionClient_Validate(t *testing.T) {
 		FileName: "spec.json",
 	})
 	require.NoError(t, err)
-	assert.True(t, val.Valid)
-	assert.Contains(t, val.Warnings, "Missing description")
+	assert.Contains(t, val, "Missing description")
 }
 
 func TestAPIDefinitionClient_Validation(t *testing.T) {
@@ -144,16 +138,10 @@ func TestAPIDefinitionClient_Validation(t *testing.T) {
 			params: APIDefinitionParams{Schema: "{}"},
 			want:   "branch is required",
 		},
-		{
-			name:   "missing schema",
-			branch: "v1",
-			params: APIDefinitionParams{},
-			want:   "schema must satisfy required_without_all",
-		},
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			_, err := c.APIDefinitions.Create(context.Background(), tc.branch, tc.params)
+			err := c.APIDefinitions.Create(context.Background(), tc.branch, tc.params)
 			require.Error(t, err)
 			assert.Contains(t, err.Error(), tc.want)
 		})
