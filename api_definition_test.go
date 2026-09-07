@@ -2,7 +2,6 @@ package readme
 
 import (
 	"context"
-	"encoding/json"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -17,11 +16,16 @@ func TestAPIDefinitionClient_Create(t *testing.T) {
 	srv := httptest.NewServer(jsonHandler(func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodPost, r.Method)
 		assert.Equal(t, "/branches/v1/apis", r.URL.Path)
+		assert.Contains(t, r.Header.Get("Content-Type"), "multipart/form-data")
 
-		body, _ := io.ReadAll(r.Body)
-		var got APIDefinitionParams
-		require.NoError(t, json.Unmarshal(body, &got))
-		assert.Equal(t, specContent, got.Schema)
+		err := r.ParseMultipartForm(32 << 20)
+		require.NoError(t, err)
+
+		f, _, err := r.FormFile("schema")
+		require.NoError(t, err)
+		defer f.Close()
+		content, _ := io.ReadAll(f)
+		assert.Equal(t, specContent, string(content))
 
 		_, _ = w.Write([]byte(`{"data":{"id":"api-123","version":"v1","title":"Test API"}}`))
 	}))
@@ -29,7 +33,8 @@ func TestAPIDefinitionClient_Create(t *testing.T) {
 
 	c := newTestClient(t, srv)
 	apiDef, err := c.APIDefinitions.Create(context.Background(), "v1", APIDefinitionParams{
-		Schema: specContent,
+		Schema:   specContent,
+		FileName: "spec.json",
 	})
 	require.NoError(t, err)
 	assert.Equal(t, "api-123", apiDef.ID)
@@ -57,11 +62,16 @@ func TestAPIDefinitionClient_Update(t *testing.T) {
 	srv := httptest.NewServer(jsonHandler(func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodPut, r.Method)
 		assert.Equal(t, "/branches/v1/apis/petstore.json", r.URL.Path)
+		assert.Contains(t, r.Header.Get("Content-Type"), "multipart/form-data")
 
-		body, _ := io.ReadAll(r.Body)
-		var got APIDefinitionParams
-		require.NoError(t, json.Unmarshal(body, &got))
-		assert.Equal(t, specContent, got.Schema)
+		err := r.ParseMultipartForm(32 << 20)
+		require.NoError(t, err)
+
+		f, _, err := r.FormFile("schema")
+		require.NoError(t, err)
+		defer f.Close()
+		content, _ := io.ReadAll(f)
+		assert.Equal(t, specContent, string(content))
 
 		_, _ = w.Write([]byte(`{"data":{"id":"petstore.json","version":"v1","title":"Updated API"}}`))
 	}))
@@ -69,7 +79,8 @@ func TestAPIDefinitionClient_Update(t *testing.T) {
 
 	c := newTestClient(t, srv)
 	apiDef, err := c.APIDefinitions.Update(context.Background(), "v1", "petstore.json", APIDefinitionParams{
-		Schema: specContent,
+		Schema:   specContent,
+		FileName: "petstore.json",
 	})
 	require.NoError(t, err)
 	assert.Equal(t, "petstore.json", apiDef.ID)
@@ -94,11 +105,16 @@ func TestAPIDefinitionClient_Validate(t *testing.T) {
 	srv := httptest.NewServer(jsonHandler(func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodPost, r.Method)
 		assert.Equal(t, "/validate/api", r.URL.Path)
+		assert.Contains(t, r.Header.Get("Content-Type"), "multipart/form-data")
 
-		body, _ := io.ReadAll(r.Body)
-		var got APIDefinitionParams
-		require.NoError(t, json.Unmarshal(body, &got))
-		assert.Equal(t, specContent, got.Schema)
+		err := r.ParseMultipartForm(32 << 20)
+		require.NoError(t, err)
+
+		f, _, err := r.FormFile("schema")
+		require.NoError(t, err)
+		defer f.Close()
+		content, _ := io.ReadAll(f)
+		assert.Equal(t, specContent, string(content))
 
 		_, _ = w.Write([]byte(`{"data":{"valid":true,"warnings":["Missing description"]}}`))
 	}))
@@ -106,7 +122,8 @@ func TestAPIDefinitionClient_Validate(t *testing.T) {
 
 	c := newTestClient(t, srv)
 	val, err := c.APIDefinitions.Validate(context.Background(), "v1", APIDefinitionParams{
-		Schema: specContent,
+		Schema:   specContent,
+		FileName: "spec.json",
 	})
 	require.NoError(t, err)
 	assert.True(t, val.Valid)

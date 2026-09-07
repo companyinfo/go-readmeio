@@ -25,7 +25,7 @@ type APIDefinitionService interface {
 	// Get retrieves a single API definition by its filename.
 	Get(ctx context.Context, branch, filename string) (*APIDefinition, error)
 	// Update updates an existing API definition identified by its filename.
-	Update(ctx context.Context, branch, filename string, params APIDefinitionParams) (*APIDefinition, error)
+	Update(ctx context.Context, branch, filename string, params APIDefinitionParams) error
 	// Delete removes an API definition identified by its filename.
 	Delete(ctx context.Context, branch, filename string) error
 	// Validate validates an API definition without uploading it.
@@ -58,16 +58,25 @@ func (a *APIDefinitionClient) Create(ctx context.Context, branch string, params 
 	}
 
 	var out apiDefinitionResponse
-	resp, err := a.client.NewRequest(ctx).
+	req := a.client.NewRequest(ctx).
 		SetPathParams(map[string]string{
 			"branch": branch,
 		}).
-		//TODO fix this for the other params.
-		SetMultipartField("schema", params.FileName, "application/json",
-			strings.NewReader(params.Schema)).
 		SetResult(&out).
-		SetError(&APIError{}).
-		Post("/branches/{branch}/apis")
+		SetError(&APIError{})
+
+	if params.Schema != "" {
+		req.SetMultipartField("schema", params.FileName, "application/json",
+			strings.NewReader(params.Schema))
+	}
+	if params.Url != "" {
+		req.SetMultipartFormData(map[string]string{"url": params.Url})
+	}
+	if params.UploadSource != "" {
+		req.SetMultipartFormData(map[string]string{"upload_source": params.UploadSource})
+	}
+
+	resp, err := req.Post("/branches/{branch}/apis")
 	if err != nil {
 		return err
 	}
@@ -108,35 +117,46 @@ func (a *APIDefinitionClient) Get(ctx context.Context, branch, filename string) 
 
 // Update updates an existing API definition identified by its filename.
 // ReadMe API v2: PUT /branches/{branch}/apis/{filename}
-func (a *APIDefinitionClient) Update(ctx context.Context, branch, filename string, params APIDefinitionParams) (*APIDefinition, error) {
+func (a *APIDefinitionClient) Update(ctx context.Context, branch, filename string, params APIDefinitionParams) error {
 	if err := validateBranch(branch); err != nil {
-		return nil, err
+		return err
 	}
 	if filename == "" {
-		return nil, errors.New("filename is required")
+		return errors.New("filename is required")
 	}
 	if err := validateParams(params); err != nil {
-		return nil, err
+		return err
 	}
 
 	var out apiDefinitionResponse
-	resp, err := a.client.NewRequest(ctx).
+	req := a.client.NewRequest(ctx).
 		SetPathParams(map[string]string{
 			"branch":   branch,
 			"filename": filename,
 		}).
-		SetMultipartField("schema", params.FileName, "application/json", strings.NewReader(params.Schema)).
-		SetBody(params).
 		SetResult(&out).
-		SetError(&APIError{}).
-		Put("/branches/{branch}/apis/{filename}")
+		SetError(&APIError{})
+
+	if params.Schema != "" {
+		req.SetMultipartField("schema", params.FileName, "application/json",
+			strings.NewReader(params.Schema))
+	}
+	if params.Url != "" {
+		req.SetMultipartFormData(map[string]string{"url": params.Url})
+	}
+	if params.UploadSource != "" {
+		req.SetMultipartFormData(map[string]string{"upload_source": params.UploadSource})
+	}
+
+	resp, err := req.Put("/branches/{branch}/apis/{filename}")
+
 	if err != nil {
-		return nil, err
+		return err
 	}
 	if resp.IsError() {
-		return nil, apiErrorFromResponse(resp)
+		return apiErrorFromResponse(resp)
 	}
-	return &out.Data, nil
+	return nil
 }
 
 // Delete removes an API definition identified by its filename.
@@ -176,14 +196,25 @@ func (a *APIDefinitionClient) Validate(ctx context.Context, branch string, param
 	}
 
 	var out apiDefinitionValidationResponse
-	resp, err := a.client.NewRequest(ctx).
+	req := a.client.NewRequest(ctx).
 		SetPathParams(map[string]string{
 			"branch": branch,
 		}).
-		SetBody(params).
 		SetResult(&out).
-		SetError(&APIError{}).
-		Post("/validate/api")
+		SetError(&APIError{})
+
+	if params.Schema != "" {
+		req.SetMultipartField("schema", params.FileName, "application/json",
+			strings.NewReader(params.Schema))
+	}
+	if params.Url != "" {
+		req.SetMultipartFormData(map[string]string{"url": params.Url})
+	}
+	if params.UploadSource != "" {
+		req.SetMultipartFormData(map[string]string{"upload_source": params.UploadSource})
+	}
+
+	resp, err := req.Post("/validate/api")
 	if err != nil {
 		return nil, err
 	}
