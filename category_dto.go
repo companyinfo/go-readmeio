@@ -11,7 +11,7 @@ import (
 // allowed values when the input is empty or unknown.
 func validateSection(s CategoryType) error {
 	switch canonSection(s) {
-	case "guide", "reference":
+	case "guides", "reference":
 		return nil
 	default:
 		return errors.New("section must be one of [guides reference]")
