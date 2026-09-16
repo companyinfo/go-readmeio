@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"strings"
+
+	"github.com/go-resty/resty/v2"
 )
 
 // apiDefinitionResponse wraps single-item responses from the API Definition API.
@@ -29,11 +31,11 @@ type APIDefinitionService interface {
 	// Delete removes an API definition identified by its filename.
 	Delete(ctx context.Context, branch, filename string) error
 	// Validate validates an API definition without uploading it.
-	Validate(ctx context.Context, branch string, params APIDefinitionParams) (string, error)
+	Validate(ctx context.Context, branch string, params APIDefinitionParams) (ApiDefinitionValidationResponse, error)
 }
 
-// apiDefinitionValidationResponse wraps responses from the API Definition Validation API.
-type apiDefinitionValidationResponse struct {
+// ApiDefinitionValidationResponse wraps responses from the API Definition Validation API.
+type ApiDefinitionValidationResponse struct {
 	Data string `json:"data"`
 }
 
@@ -65,6 +67,19 @@ func (a *APIDefinitionClient) Create(ctx context.Context, branch string, params 
 		SetResult(&out).
 		SetError(&APIError{})
 
+	a.setMultipartFields(req, params)
+
+	resp, err := req.Post("/branches/{branch}/apis")
+	if err != nil {
+		return err
+	}
+	if resp.IsError() {
+		return apiErrorFromResponse(resp)
+	}
+	return nil
+}
+
+func (a *APIDefinitionClient) setMultipartFields(req *resty.Request, params APIDefinitionParams) {
 	if params.Schema != "" {
 		req.SetMultipartField("schema", params.FileName, "application/json",
 			strings.NewReader(params.Schema))
@@ -75,15 +90,6 @@ func (a *APIDefinitionClient) Create(ctx context.Context, branch string, params 
 	if params.UploadSource != "" {
 		req.SetMultipartFormData(map[string]string{"upload_source": params.UploadSource})
 	}
-
-	resp, err := req.Post("/branches/{branch}/apis")
-	if err != nil {
-		return err
-	}
-	if resp.IsError() {
-		return apiErrorFromResponse(resp)
-	}
-	return nil
 }
 
 // Get retrieves a single API definition by its filename.
@@ -137,16 +143,7 @@ func (a *APIDefinitionClient) Update(ctx context.Context, branch, filename strin
 		SetResult(&out).
 		SetError(&APIError{})
 
-	if params.Schema != "" {
-		req.SetMultipartField("schema", params.FileName, "application/json",
-			strings.NewReader(params.Schema))
-	}
-	if params.Url != "" {
-		req.SetMultipartFormData(map[string]string{"url": params.Url})
-	}
-	if params.UploadSource != "" {
-		req.SetMultipartFormData(map[string]string{"upload_source": params.UploadSource})
-	}
+	a.setMultipartFields(req, params)
 
 	resp, err := req.Put("/branches/{branch}/apis/{filename}")
 
@@ -186,13 +183,13 @@ func (a *APIDefinitionClient) Delete(ctx context.Context, branch, filename strin
 }
 
 // Validate validates an API definition without uploading it.
-// ReadMe API v2: POST /branches/{branch}/api-specification/validate
-func (a *APIDefinitionClient) Validate(ctx context.Context, branch string, params APIDefinitionParams) (string, error) {
+// ReadMe API v2: POST /validate/api
+func (a *APIDefinitionClient) Validate(ctx context.Context, branch string, params APIDefinitionParams) (ApiDefinitionValidationResponse, error) {
 	if err := validateBranch(branch); err != nil {
-		return "", err
+		return ApiDefinitionValidationResponse{Data: ""}, err
 	}
 	if err := validateParams(params); err != nil {
-		return "", err
+		return ApiDefinitionValidationResponse{Data: ""}, err
 	}
 
 	req := a.client.NewRequest(ctx).
@@ -201,23 +198,14 @@ func (a *APIDefinitionClient) Validate(ctx context.Context, branch string, param
 		}).
 		SetError(&APIError{})
 
-	if params.Schema != "" {
-		req.SetMultipartField("schema", params.FileName, "application/json",
-			strings.NewReader(params.Schema))
-	}
-	if params.Url != "" {
-		req.SetMultipartFormData(map[string]string{"url": params.Url})
-	}
-	if params.UploadSource != "" {
-		req.SetMultipartFormData(map[string]string{"upload_source": params.UploadSource})
-	}
+	a.setMultipartFields(req, params)
 
 	resp, err := req.Post("/validate/api")
 	if err != nil {
-		return "", err
+		return ApiDefinitionValidationResponse{Data: ""}, err
 	}
 	if resp.IsError() {
-		return "", apiErrorFromResponse(resp)
+		return ApiDefinitionValidationResponse{Data: ""}, apiErrorFromResponse(resp)
 	}
-	return string(resp.Body()), nil
+	return ApiDefinitionValidationResponse{Data: string(resp.Body())}, nil
 }

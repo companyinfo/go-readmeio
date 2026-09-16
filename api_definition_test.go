@@ -121,7 +121,7 @@ func TestAPIDefinitionClient_Validate(t *testing.T) {
 		FileName: "spec.json",
 	})
 	require.NoError(t, err)
-	assert.Contains(t, val, "Missing description")
+	assert.Contains(t, val.Data, "Missing description")
 }
 
 func TestAPIDefinitionClient_Validation(t *testing.T) {
@@ -135,8 +135,20 @@ func TestAPIDefinitionClient_Validation(t *testing.T) {
 		{
 			name:   "empty branch",
 			branch: "",
-			params: APIDefinitionParams{Schema: "{}"},
+			params: APIDefinitionParams{Schema: "{}", FileName: "spec.json"},
 			want:   "branch is required",
+		},
+		{
+			name:   "missing schema and url",
+			branch: "v1",
+			params: APIDefinitionParams{},
+			want:   "schema must satisfy required_without=Url",
+		},
+		{
+			name:   "schema without filename",
+			branch: "v1",
+			params: APIDefinitionParams{Schema: "{}"},
+			want:   "filename must satisfy required_with=Schema",
 		},
 	}
 	for _, tc := range cases {
