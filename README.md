@@ -98,7 +98,7 @@ All operations require a branch (version) path parameter (e.g., v1.0, v0.0).
 
 Create a category:
 ```go
-created, err := client.Categories.Create(ctx, "v0.0", readme.CategoryParams{
+created, err := client.Categories.Create(ctx, "v0.0", readme.CategoryCreateParams{
   Title:   "Payments",
   Section: readme.CategoryTypeReference,
 })
@@ -125,6 +125,14 @@ r, err := client.Reference.Create(ctx, "v0.0", readme.ReferenceParams{
 Upload an API definition:
 ```go
 err := client.APIDefinitions.Create(ctx, "v0.0", readme.APIDefinitionParams{
+  FileName: "petstore.json",
+  Schema:   `{"openapi":"3.0.0", ...}`,
+})
+```
+
+Update an API definition:
+```go
+err := client.APIDefinitions.Update(ctx, "v0.0", readme.APIDefinitionParams{
   FileName: "petstore.json",
   Schema:   `{"openapi":"3.0.0", ...}`,
 })

@@ -43,14 +43,14 @@ func TestAPIDefinitionClient_Get(t *testing.T) {
 	srv := httptest.NewServer(jsonHandler(func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
 		assert.Equal(t, "/branches/v1/apis/petstore.json", r.URL.Path)
-		_, _ = w.Write([]byte(`{"data":{"id":"petstore.json","version":"v1","title":"Petstore"}}`))
+		_, _ = w.Write([]byte(`{"data":{"filename":"petstore.json","version":"v1","title":"Petstore"}}`))
 	}))
 	defer srv.Close()
 
 	c := newTestClient(t, srv)
 	apiDef, err := c.APIDefinitions.Get(context.Background(), "v1", "petstore.json")
 	require.NoError(t, err)
-	assert.Equal(t, "petstore.json", apiDef.ID)
+	assert.Equal(t, "petstore.json", apiDef.Filename)
 	assert.Equal(t, "Petstore", apiDef.Title)
 }
 
@@ -75,7 +75,7 @@ func TestAPIDefinitionClient_Update(t *testing.T) {
 	defer srv.Close()
 
 	c := newTestClient(t, srv)
-	err := c.APIDefinitions.Update(context.Background(), "v1", "petstore.json", APIDefinitionParams{
+	err := c.APIDefinitions.Update(context.Background(), "v1", APIDefinitionParams{
 		Schema:   specContent,
 		FileName: "petstore.json",
 	})
@@ -142,7 +142,7 @@ func TestAPIDefinitionClient_Validation(t *testing.T) {
 			name:   "missing schema and url",
 			branch: "v1",
 			params: APIDefinitionParams{},
-			want:   "schema must satisfy required_without=Url",
+			want:   "schema must satisfy required_without_all=UploadSource Url",
 		},
 		{
 			name:   "schema without filename",

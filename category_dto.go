@@ -36,6 +36,8 @@ const (
 	CategoryTypeReference CategoryType = "reference"
 	// CategoryTypeGuides represents the Guides (knowledge base) section.
 	CategoryTypeGuides CategoryType = "guides"
+	// CategoryTypeGuide is used for the Create Category endpoint
+	CategoryTypeGuide CategoryType = "guide"
 )
 
 // Category models a category returned by the ReadMe API v2.
