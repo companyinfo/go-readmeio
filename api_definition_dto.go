@@ -41,6 +41,6 @@ type APIDefinitionParams struct {
 	// Schema is the OpenAPI or Swagger specification as a string (JSON or YAML).
 	FileName     string `json:"filename,omitzero" validate:"required_with=Schema"`
 	Schema       string `json:"schema,omitzero" validate:"required_without=Url UploadSource"`
-	UploadSource string `json:"upload_source,omitzero" validate:"required_with=Url Schema"`
+	UploadSource string `json:"upload_source,omitzero" validate:"required_without=Url Schema"`
 	Url          string `json:"url,omitzero" validate:"required_without=Schema UploadSource"`
 }
