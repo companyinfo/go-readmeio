@@ -58,7 +58,22 @@ type CategoryLinks struct {
 	Project string `json:"project"`
 }
 
-// CategoryParams contains the fields used when creating or updating a category
+// CategoryCreateParams contains the fields used when creating a category
+// via the ReadMe API v2.
+//
+// Note: in v2 the version/branch is supplied as a path parameter and is no
+// longer part of the request body. Validation tags (consumed by
+// go-playground/validator) describe the requirements for the **Create**
+// endpoint: `title` is required and `section` must be one of "guides" or
+// "reference".
+type CategoryCreateParams struct {
+	// Title is the title of the category.
+	Title string `json:"title" validate:"required"`
+	// Section is "guides" or "reference". Required on Create; optional on Update.
+	Section CategoryType `json:"section,omitempty" validate:"required,oneof=guide reference"`
+}
+
+// CategoryParams contains the fields for all the category endpoints except Create. For some reason the Create endpoint has some minor differences
 // via the ReadMe API v2.
 //
 // Note: in v2 the version/branch is supplied as a path parameter and is no
@@ -70,5 +85,7 @@ type CategoryParams struct {
 	// Title is the title of the category.
 	Title string `json:"title" validate:"required"`
 	// Section is "guides" or "reference". Required on Create; optional on Update.
-	Section CategoryType `json:"section,omitempty" validate:"required,oneof=guide reference"`
+	Section CategoryType `json:"section,omitempty" validate:"required,oneof=guides reference"`
+	// Branch is the branch to which the category belongs. Required on Create; optional on Update.
+	Branch string `json:"branch,omitempty"`
 }

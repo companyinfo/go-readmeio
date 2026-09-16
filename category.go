@@ -22,7 +22,7 @@ type categoryResponse struct {
 type CategoryService interface {
 	// Create creates a new category on the given branch. The category's section
 	// ("guides" or "reference") is provided in params and sent in the request body.
-	Create(ctx context.Context, branch string, params CategoryParams) (*Category, error)
+	Create(ctx context.Context, branch string, params CategoryCreateParams) (*Category, error)
 	// List retrieves all categories on the given branch for the given section
 	// ("guides" or "reference").
 	List(ctx context.Context, branch string, section CategoryType) ([]Category, error)
@@ -65,7 +65,7 @@ func validateTitle(title string) error {
 
 // Create creates a new category on the given branch.
 // ReadMe API v2: POST /branches/{branch}/categories
-func (c *CategoryClient) Create(ctx context.Context, branch string, params CategoryParams) (*Category, error) {
+func (c *CategoryClient) Create(ctx context.Context, branch string, params CategoryCreateParams) (*Category, error) {
 	if err := validateBranch(branch); err != nil {
 		return nil, err
 	}

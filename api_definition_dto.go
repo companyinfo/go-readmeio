@@ -6,7 +6,6 @@ import "time"
 //
 // See: https://docs.readme.com/main/reference/getapis
 type APIDefinition struct {
-	ID        string              `json:"id"`
 	Version   string              `json:"version"` // branch/version slug
 	Title     string              `json:"title"`
 	UpdatedAt string              `json:"updated_at,omitzero"`
@@ -40,7 +39,7 @@ type APIDefinitionUpload struct {
 type APIDefinitionParams struct {
 	// Schema is the OpenAPI or Swagger specification as a string (JSON or YAML).
 	FileName     string `json:"filename,omitzero" validate:"required_with=Schema"`
-	Schema       string `json:"schema,omitzero" validate:"required_without=Url UploadSource"`
-	UploadSource string `json:"upload_source,omitzero" validate:"required_without=Url"`
-	Url          string `json:"url,omitzero" validate:"required_without=UploadSource"`
+	Schema       string `json:"schema,omitzero" validate:"required_without_all=UploadSource Url"`
+	UploadSource string `json:"upload_source,omitzero" validate:"required_without_all=Schema Url"`
+	Url          string `json:"url,omitzero" validate:"required_without_all=UploadSource Schema"`
 }

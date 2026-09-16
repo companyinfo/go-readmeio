@@ -204,10 +204,10 @@ func main() {
 	if err != nil {
 		log.Fatalf("apiDefinitions.Get: %v", err)
 	}
-	fmt.Printf("Fetched API definition: title=%q id=%q\n", apiDef.Title, apiDef.ID)
+	fmt.Printf("Fetched API definition: title=%q ", apiDef.Title)
 
 	fmt.Println("Updating API definition...")
-	err = client.APIDefinitions.Update(ctx, branch, filename, readme.APIDefinitionParams{
+	err = client.APIDefinitions.Update(ctx, branch, readme.APIDefinitionParams{
 		Schema:   `{"openapi":"3.0.0","info":{"title":"Example API (updated)","version":"1.0.0"},"paths":{}}`,
 		FileName: filename,
 	})

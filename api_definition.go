@@ -27,7 +27,7 @@ type APIDefinitionService interface {
 	// Get retrieves a single API definition by its filename.
 	Get(ctx context.Context, branch, filename string) (*APIDefinition, error)
 	// Update updates an existing API definition identified by its filename.
-	Update(ctx context.Context, branch, params APIDefinitionParams) error
+	Update(ctx context.Context, branch string, params APIDefinitionParams) error
 	// Delete removes an API definition identified by its filename.
 	Delete(ctx context.Context, branch, filename string) error
 	// Validate validates an API definition without uploading it.
