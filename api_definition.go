@@ -27,7 +27,7 @@ type APIDefinitionService interface {
 	// Get retrieves a single API definition by its filename.
 	Get(ctx context.Context, branch, filename string) (*APIDefinition, error)
 	// Update updates an existing API definition identified by its filename.
-	Update(ctx context.Context, branch, filename string, params APIDefinitionParams) error
+	Update(ctx context.Context, branch, params APIDefinitionParams) error
 	// Delete removes an API definition identified by its filename.
 	Delete(ctx context.Context, branch, filename string) error
 	// Validate validates an API definition without uploading it.
@@ -123,11 +123,11 @@ func (a *APIDefinitionClient) Get(ctx context.Context, branch, filename string) 
 
 // Update updates an existing API definition identified by its filename.
 // ReadMe API v2: PUT /branches/{branch}/apis/{filename}
-func (a *APIDefinitionClient) Update(ctx context.Context, branch, filename string, params APIDefinitionParams) error {
+func (a *APIDefinitionClient) Update(ctx context.Context, branch string, params APIDefinitionParams) error {
 	if err := validateBranch(branch); err != nil {
 		return err
 	}
-	if filename == "" {
+	if params.FileName == "" {
 		return errors.New("filename is required")
 	}
 	if err := validateParams(params); err != nil {
@@ -138,7 +138,7 @@ func (a *APIDefinitionClient) Update(ctx context.Context, branch, filename strin
 	req := a.client.NewRequest(ctx).
 		SetPathParams(map[string]string{
 			"branch":   branch,
-			"filename": filename,
+			"filename": params.FileName,
 		}).
 		SetResult(&out).
 		SetError(&APIError{})
