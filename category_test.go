@@ -19,17 +19,17 @@ func TestCategoryClient_Create(t *testing.T) {
 		assert.Equal(t, "Bearer test-token", r.Header.Get("Authorization"))
 
 		body, _ := io.ReadAll(r.Body)
-		var got CategoryParams
+		var got CategoryCreateParams
 		require.NoError(t, json.Unmarshal(body, &got))
 		assert.Equal(t, "Intro", got.Title)
-		assert.Equal(t, CategoryTypeGuides, got.Section)
+		assert.Equal(t, CategoryTypeGuide, got.Section)
 
 		_, _ = w.Write([]byte(`{"data":{"title":"Intro","section":"guides","uri":"/categories/guides/intro"}}`))
 	}))
 	defer srv.Close()
 
 	c := newTestClient(t, srv)
-	cat, err := c.Categories.Create(context.Background(), "v1", CategoryParams{Title: "Intro", Section: CategoryTypeGuides})
+	cat, err := c.Categories.Create(context.Background(), "v1", CategoryCreateParams{Title: "Intro", Section: CategoryTypeGuide})
 	require.NoError(t, err)
 	assert.Equal(t, "Intro", cat.Title)
 	assert.Equal(t, "/categories/guides/intro", cat.URI)
@@ -98,7 +98,7 @@ func TestCategoryClient_APIError(t *testing.T) {
 	defer srv.Close()
 
 	c := newTestClient(t, srv)
-	_, err := c.Categories.Create(context.Background(), "v1", CategoryParams{Title: "x", Section: CategoryTypeGuides})
+	_, err := c.Categories.Create(context.Background(), "v1", CategoryCreateParams{Title: "x", Section: CategoryTypeGuide})
 	require.Error(t, err)
 	apiErr, ok := err.(*APIError)
 	require.True(t, ok, "expected *APIError, got %T", err)
@@ -115,15 +115,15 @@ func TestCategoryClient_Validation(t *testing.T) {
 		want string
 	}{
 		{"create empty branch", func() error {
-			_, e := c.Categories.Create(context.Background(), "", CategoryParams{Title: "t", Section: CategoryTypeGuides})
+			_, e := c.Categories.Create(context.Background(), "", CategoryCreateParams{Title: "t", Section: CategoryTypeGuides})
 			return e
 		}, "branch"},
 		{"create empty title", func() error {
-			_, e := c.Categories.Create(context.Background(), "v1", CategoryParams{Section: CategoryTypeGuides})
+			_, e := c.Categories.Create(context.Background(), "v1", CategoryCreateParams{Section: CategoryTypeGuides})
 			return e
 		}, "title"},
 		{"create bad section", func() error {
-			_, e := c.Categories.Create(context.Background(), "v1", CategoryParams{Title: "t", Section: "bogus"})
+			_, e := c.Categories.Create(context.Background(), "v1", CategoryCreateParams{Title: "t", Section: "bogus"})
 			return e
 		}, "section"},
 		{"get bad section", func() error {
