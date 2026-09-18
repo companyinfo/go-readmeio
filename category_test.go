@@ -22,7 +22,7 @@ func TestCategoryClient_Create(t *testing.T) {
 		var got CategoryCreateParams
 		require.NoError(t, json.Unmarshal(body, &got))
 		assert.Equal(t, "Intro", got.Title)
-		assert.Equal(t, CategoryTypeGuides, got.Section)
+		assert.Equal(t, CategoryTypeGuide, got.Section)
 
 		_, _ = w.Write([]byte(`{"data":{"title":"Intro","section":"guides","uri":"/categories/guides/intro"}}`))
 	}))
@@ -98,7 +98,7 @@ func TestCategoryClient_APIError(t *testing.T) {
 	defer srv.Close()
 
 	c := newTestClient(t, srv)
-	_, err := c.Categories.Create(context.Background(), "v1", CategoryCreateParams{Title: "x", Section: CategoryTypeGuides})
+	_, err := c.Categories.Create(context.Background(), "v1", CategoryCreateParams{Title: "x", Section: CategoryTypeGuide})
 	require.Error(t, err)
 	apiErr, ok := err.(*APIError)
 	require.True(t, ok, "expected *APIError, got %T", err)
